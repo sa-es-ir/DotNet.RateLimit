@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNet.RateLimit.Extensions;
+using DotNet.RateLimit.Interfaces;
+using DotNet.RateLimit.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -23,8 +25,19 @@ namespace DotNet.RateLimit.ActionFilters
             _options = options;
         }
 
+        /// <summary>
+        /// order execution of 
+        /// </summary>
         public int Order { get; set; }
+
+        /// <summary>
+        /// by default rate limit work on IP address but if userIdentifier set it will look at HttpContext.Items[UserIdentifier]
+        /// </summary>
         public string UserIdentifier { get; set; }
+
+        /// <summary>
+        /// period of time in seconds for rate limit
+        /// </summary>
         public int PeriodInSec { get; set; }
         public int Limit { get; set; }
         public string VaryByParams { get; set; }
@@ -50,9 +63,7 @@ namespace DotNet.RateLimit.ActionFilters
                 var controller = context.ActionDescriptor.RouteValues["Controller"];
                 var action = context.ActionDescriptor.RouteValues["Action"];
 
-
                 bool hasAccess = await _rateLimitService.HasAccessAsync($"{userKey}:{controller}:{action}", PeriodInSec, Limit);
-
                 if (hasAccess && !string.IsNullOrWhiteSpace(VaryByParams))
                 {
                     var parameters = VaryByParams.Split(',');
@@ -94,14 +105,4 @@ namespace DotNet.RateLimit.ActionFilters
             }
         }
     }
-
-    public class RateLimitResponse
-    {
-        public string Message { get; set; }
-
-        public int Code { get; set; }
-
-        public HttpStatusCode Status => (HttpStatusCode)Code;
-    }
-
 }

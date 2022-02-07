@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotNet.RateLimit
+namespace DotNet.RateLimit.Interfaces
 {
     public interface IRateLimitBackgroundTaskQueue
     {

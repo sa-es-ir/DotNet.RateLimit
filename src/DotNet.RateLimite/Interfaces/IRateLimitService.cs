@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DotNet.RateLimit
+namespace DotNet.RateLimit.Interfaces
 {
     /// <summary>
     /// rate limit service

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNet.RateLimit.ActionFilters
 {
-    public class RateLimitFilterFactory : Attribute, IFilterFactory
+    public class RateLimit : Attribute, IFilterFactory
     {
         public int Order { get; set; }
         public string UserIdentifier { get; set; }
