@@ -14,29 +14,20 @@ namespace DotNet.RateLimit.Implementations
         private readonly IDatabase _database;
         private readonly ILogger<RedisRateLimitService> _logger;
         private readonly IRateLimitBackgroundTaskQueue _backgroundTaskQueue;
-        private readonly IOptions<RateLimitOptions> _options;
-        private readonly IMemoryCache _memoryCache;
-
 
         public RedisRateLimitService(ILogger<RedisRateLimitService> logger,
             IRateLimitBackgroundTaskQueue backgroundTaskQueue,
-            IOptions<RateLimitOptions> options,
-            IDatabase database, IMemoryCache memoryCache)
+            IDatabase database)
         {
             _logger = logger;
             _backgroundTaskQueue = backgroundTaskQueue;
-            _options = options;
             _database = database;
-            _memoryCache = memoryCache;
         }
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            if (!_options.Value.EnableRateLimit)
-                return true;
-
-            var counts = await _database.SortedSetLengthAsync(resourceKey, ToUtcTimestamp(DateTime.Now.AddSeconds(-periodInSec)),
-                ToUtcTimestamp(DateTime.Now.AddSeconds(periodInSec)));
+            var counts = await _database.SortedSetLengthAsync(resourceKey, ToUtcTimestamp(DateTime.UtcNow.AddSeconds(-periodInSec)),
+                ToUtcTimestamp(DateTime.UtcNow.AddSeconds(periodInSec)));
 
             if (counts >= limit)
             {
@@ -45,12 +36,11 @@ namespace DotNet.RateLimit.Implementations
                 return false;
             }
 
-            _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.SortedSetAddAsync(resourceKey, DateTime.Now.Ticks,
-                ToUtcTimestamp(DateTime.Now), CommandFlags.FireAndForget));
+            _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.SortedSetAddAsync(resourceKey, DateTime.UtcNow.Ticks,
+                ToUtcTimestamp(DateTime.UtcNow), CommandFlags.FireAndForget));
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.KeyExpireAsync(resourceKey,
                 TimeSpan.FromSeconds(periodInSec), CommandFlags.FireAndForget));
-
 
             return true;
         }

@@ -12,15 +12,12 @@ namespace DotNet.RateLimit.Implementations
     {
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<InMemoryRateLimitService> _logger;
-        private readonly IOptions<RateLimitOptions> _options;
 
         public InMemoryRateLimitService(IMemoryCache memoryCache,
-            ILogger<InMemoryRateLimitService> logger,
-            IOptions<RateLimitOptions> options)
+            ILogger<InMemoryRateLimitService> logger)
         {
             _memoryCache = memoryCache;
             _logger = logger;
-            _options = options;
         }
 
         public Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
@@ -48,6 +45,8 @@ namespace DotNet.RateLimit.Implementations
 
                         return Task.FromResult(false);
                     }
+
+                    _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
 
                     return Task.FromResult(true);
                 }
