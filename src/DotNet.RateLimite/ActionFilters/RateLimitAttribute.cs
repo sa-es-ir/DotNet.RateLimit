@@ -46,6 +46,7 @@ namespace DotNet.RateLimit.ActionFilters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+
             try
             {
                 if (!_options.Value.EnableRateLimit)

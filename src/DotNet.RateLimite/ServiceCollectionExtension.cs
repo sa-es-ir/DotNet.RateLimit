@@ -13,7 +13,7 @@ namespace DotNet.RateLimit
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
-            services.AddScoped<IRateLimitService, RateLimitService>();
+            services.AddScoped<IRateLimitService, RedisRateLimitService>();
             services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
             services.AddHostedService<QueuedHostedService>();
             services.AddScoped<RateLimitAttribute>();

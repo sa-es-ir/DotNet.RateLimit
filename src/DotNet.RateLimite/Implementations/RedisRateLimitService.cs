@@ -2,26 +2,32 @@
 using System.Threading.Tasks;
 using DotNet.RateLimit.Interfaces;
 using DotNet.RateLimit.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace DotNet.RateLimit.Implementations
 {
-    public class RateLimitService : IRateLimitService
+    public class RedisRateLimitService : IRateLimitService
     {
         private readonly IDatabase _database;
-        private readonly ILogger<RateLimitService> _logger;
+        private readonly ILogger<RedisRateLimitService> _logger;
         private readonly IRateLimitBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IOptions<RateLimitOptions> _options;
+        private readonly IMemoryCache _memoryCache;
 
-        public RateLimitService(ILogger<RateLimitService> logger,
-            IRateLimitBackgroundTaskQueue backgroundTaskQueue, IOptions<RateLimitOptions> options, IDatabase database)
+
+        public RedisRateLimitService(ILogger<RedisRateLimitService> logger,
+            IRateLimitBackgroundTaskQueue backgroundTaskQueue,
+            IOptions<RateLimitOptions> options,
+            IDatabase database, IMemoryCache memoryCache)
         {
             _logger = logger;
             _backgroundTaskQueue = backgroundTaskQueue;
             _options = options;
             _database = database;
+            _memoryCache = memoryCache;
         }
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
