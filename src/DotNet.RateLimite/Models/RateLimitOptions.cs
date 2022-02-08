@@ -18,6 +18,11 @@
         public string ErrorMessage { get; set; } = "Rate limit Exceeded";
 
         /// <summary>
+        /// if redis connection present then use redis for rate limit
+        /// </summary>
+        public bool HasRedis => !string.IsNullOrEmpty(RedisConnection?.Trim());
+
+        /// <summary>
         /// redis connection
         /// </summary>
         public string RedisConnection { get; set; }

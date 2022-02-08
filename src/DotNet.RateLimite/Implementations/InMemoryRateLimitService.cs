@@ -38,6 +38,8 @@ namespace DotNet.RateLimit.Implementations
                         Total = entry.Total + 1
                     };
 
+                    _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
+
                     //rate limit exceeded
                     if (cacheEntry.Total > limit)
                     {
@@ -46,7 +48,7 @@ namespace DotNet.RateLimit.Implementations
                         return Task.FromResult(false);
                     }
 
-                    _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
+
 
                     return Task.FromResult(true);
                 }

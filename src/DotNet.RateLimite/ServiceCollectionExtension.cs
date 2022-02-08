@@ -13,16 +13,27 @@ namespace DotNet.RateLimit
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
-            services.AddScoped<IRateLimitService, RedisRateLimitService>();
-            services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
-            services.AddHostedService<QueuedHostedService>();
             services.AddScoped<RateLimitAttribute>();
 
-            //configure redis 
-            var redisConfig = ConfigurationOptions.Parse(configuration["RateLimitOption:RedisConnection"]);
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
-            services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+            var options = new RateLimitOptions();
+            configuration.GetSection("RateLimitOptions").Bind(options);
 
+            if (options.HasRedis)
+            {
+                services.AddScoped<IRateLimitService, RedisRateLimitService>();
+                services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
+                services.AddHostedService<QueuedHostedService>();
+
+                //configure redis 
+                var redisConfig = ConfigurationOptions.Parse(configuration["RateLimitOption:RedisConnection"]);
+                services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
+                services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+            }
+            else
+            {
+                services.AddMemoryCache();
+                services.AddScoped<IRateLimitService, InMemoryRateLimitService>();
+            }
         }
     }
 }
