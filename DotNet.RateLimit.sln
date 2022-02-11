@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.RateLimit", "src\DotNet.RateLimite\DotNet.RateLimit.csproj", "{00BCB31B-F447-48C3-A151-5DB3DF84B6A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.RateLimiter", "src\DotNet.RateLimiter\DotNet.RateLimiter.csproj", "{00BCB31B-F447-48C3-A151-5DB3DF84B6A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{643362CC-1522-4E30-9DE9-AB8D46D0176F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{78573C0A-C9E3-4A2C-82FB-95B32BCD907B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.RateLimit.Test", "test\DotNet.RateLimit.Test\DotNet.RateLimit.Test.csproj", "{A3F2F16D-DF90-420F-9BFD-639F6A6F5310}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.RateLimiter.Test", "test\DotNet.RateLimiter.Test\DotNet.RateLimiter.Test.csproj", "{A3F2F16D-DF90-420F-9BFD-639F6A6F5310}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{FB9E4051-5E15-4F6B-822F-009F427634D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.RateLimit.Demo", "demo\DotNet.RateLimit.Demo\DotNet.RateLimit.Demo.csproj", "{230259B6-32E7-4E64-AC18-6ED13762BF75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.RateLimiter.Demo", "demo\DotNet.RateLimiter.Demo\DotNet.RateLimiter.Demo.csproj", "{230259B6-32E7-4E64-AC18-6ED13762BF75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
