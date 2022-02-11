@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotNet.RateLimit.Interfaces;
-using DotNet.RateLimit.Models;
+using DotNet.RateLimiter.Interfaces;
+using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace DotNet.RateLimit.Implementations
+namespace DotNet.RateLimiter.Implementations
 {
     public class InMemoryRateLimitService : IRateLimitService
     {

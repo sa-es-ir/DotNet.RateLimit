@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 
-namespace DotNet.RateLimit.Extensions
+namespace DotNet.RateLimiter.Extensions
 {
     public static class HttpRequestExtension
     {

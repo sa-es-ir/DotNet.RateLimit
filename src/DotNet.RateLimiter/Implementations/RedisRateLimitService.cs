@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DotNet.RateLimit.Interfaces;
-using DotNet.RateLimit.Models;
-using Microsoft.Extensions.Caching.Memory;
+using DotNet.RateLimiter.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace DotNet.RateLimit.Implementations
+namespace DotNet.RateLimiter.Implementations
 {
     public class RedisRateLimitService : IRateLimitService
     {

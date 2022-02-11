@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using DotNet.RateLimit.Interfaces;
+using DotNet.RateLimiter.Interfaces;
 
-namespace DotNet.RateLimit.Implementations
+namespace DotNet.RateLimiter.Implementations
 {
     public class RateLimitBackgroundTaskQueue : IRateLimitBackgroundTaskQueue
     {

@@ -1,12 +1,12 @@
-﻿using DotNet.RateLimit.ActionFilters;
-using DotNet.RateLimit.Implementations;
-using DotNet.RateLimit.Interfaces;
-using DotNet.RateLimit.Models;
+﻿using DotNet.RateLimiter.ActionFilters;
+using DotNet.RateLimiter.Implementations;
+using DotNet.RateLimiter.Interfaces;
+using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace DotNet.RateLimit
+namespace DotNet.RateLimiter
 {
     public static class ServiceCollectionExtension
     {

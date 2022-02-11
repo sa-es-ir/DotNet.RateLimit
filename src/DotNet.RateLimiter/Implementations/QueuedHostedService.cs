@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DotNet.RateLimit.Interfaces;
+using DotNet.RateLimiter.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DotNet.RateLimit.Implementations
+namespace DotNet.RateLimiter.Implementations
 {
     public class QueuedHostedService : BackgroundService
     {

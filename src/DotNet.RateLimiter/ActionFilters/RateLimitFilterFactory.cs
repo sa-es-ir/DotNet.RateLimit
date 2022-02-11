@@ -1,9 +1,8 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotNet.RateLimit.ActionFilters
+namespace DotNet.RateLimiter.ActionFilters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class RateLimit : Attribute, IFilterFactory

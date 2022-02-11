@@ -1,4 +1,4 @@
-﻿namespace DotNet.RateLimit.Models
+﻿namespace DotNet.RateLimiter.Models
 {
     public class RateLimitOptions
     {

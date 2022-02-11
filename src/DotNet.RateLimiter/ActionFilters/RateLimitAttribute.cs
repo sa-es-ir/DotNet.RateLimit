@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using DotNet.RateLimit.Extensions;
-using DotNet.RateLimit.Interfaces;
-using DotNet.RateLimit.Models;
+using DotNet.RateLimiter.Extensions;
+using DotNet.RateLimiter.Interfaces;
+using DotNet.RateLimiter.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace DotNet.RateLimit.ActionFilters
+namespace DotNet.RateLimiter.ActionFilters
 {
     public class RateLimitAttribute : IAsyncActionFilter, IOrderedFilter
     {
