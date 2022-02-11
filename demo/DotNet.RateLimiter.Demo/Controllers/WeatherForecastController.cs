@@ -1,7 +1,7 @@
+using DotNet.RateLimiter.ActionFilters;
 using Microsoft.AspNetCore.Mvc;
-using DotNet.RateLimit.ActionFilters;
 
-namespace DotNet.RateLimit.Demo.Controllers
+namespace DotNet.RateLimiter.Demo.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -9,18 +9,11 @@ namespace DotNet.RateLimit.Demo.Controllers
     {
         private static readonly string[] Summaries = new[]
         {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
-        }
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+        };
 
         [HttpGet(Name = "GetWeatherForecast")]
-        [ActionFilters.RateLimit(Limit = 2, PeriodInSec = 60)]
+        [RateLimit(PeriodInSec = 60, Limit = 5)]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

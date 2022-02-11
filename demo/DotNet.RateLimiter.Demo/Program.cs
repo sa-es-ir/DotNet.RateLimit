@@ -1,4 +1,4 @@
-using DotNet.RateLimit;
+using DotNet.RateLimiter;
 
 var builder = WebApplication.CreateBuilder(args);
 

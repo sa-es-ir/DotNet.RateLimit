@@ -2,6 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>DotNet.RateLimiter.Demo</AssemblyName>
+		<RootNamespace>DotNet.RateLimiter.Demo</RootNamespace>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
@@ -11,7 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\DotNet.RateLimite\DotNet.RateLimit.csproj" />
+		<ProjectReference Include="..\..\src\DotNet.RateLimiter\DotNet.RateLimiter.csproj" />
 	</ItemGroup>
 
 </Project>

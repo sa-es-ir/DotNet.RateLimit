@@ -1,4 +1,4 @@
-namespace DotNet.RateLimit.Demo
+namespace DotNet.RateLimiter.Demo
 {
     public class WeatherForecast
     {
@@ -8,6 +8,6 @@ namespace DotNet.RateLimit.Demo
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
-        public string? Summary { get; set; }
+        public string Summary { get; set; }
     }
 }
