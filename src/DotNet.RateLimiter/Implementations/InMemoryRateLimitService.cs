@@ -11,7 +11,7 @@ namespace DotNet.RateLimiter.Implementations
     {
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<InMemoryRateLimitService> _logger;
-
+        private readonly LockProvider<string> _lockProvider = new LockProvider<string>();
         public InMemoryRateLimitService(IMemoryCache memoryCache,
             ILogger<InMemoryRateLimitService> logger)
         {
@@ -19,43 +19,50 @@ namespace DotNet.RateLimiter.Implementations
             _logger = logger;
         }
 
-        public Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
+        public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            var cacheEntry = new InMemoryRateLimitEntry()
-            {
-                Expiration = DateTime.UtcNow,
-                Total = 1
-            };
+            await _lockProvider.WaitAsync(resourceKey);
 
-            if (_memoryCache.TryGetValue(resourceKey, out InMemoryRateLimitEntry entry))
+            try
             {
-                if (entry != null && entry.Expiration.AddSeconds(periodInSec) > DateTime.UtcNow)
+                var cacheEntry = new InMemoryRateLimitEntry()
                 {
-                    cacheEntry = new InMemoryRateLimitEntry()
+                    Expiration = DateTime.UtcNow,
+                    Total = 1
+                };
+
+                if (_memoryCache.TryGetValue(resourceKey, out InMemoryRateLimitEntry entry))
+                {
+                    if (entry != null && entry.Expiration.AddSeconds(periodInSec) > DateTime.UtcNow)
                     {
-                        Expiration = entry.Expiration,
-                        Total = entry.Total + 1
-                    };
+                        cacheEntry = new InMemoryRateLimitEntry()
+                        {
+                            Expiration = entry.Expiration,
+                            Total = entry.Total + 1
+                        };
 
-                    _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
+                        _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
 
-                    //rate limit exceeded
-                    if (cacheEntry.Total > limit)
-                    {
-                        _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{cacheEntry.Total}");
+                        //rate limit exceeded
+                        if (cacheEntry.Total > limit)
+                        {
+                            _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{cacheEntry.Total}");
 
-                        return Task.FromResult(false);
+                            return false;
+                        }
+
+                        return true;
                     }
-
-
-
-                    return Task.FromResult(true);
                 }
+
+                _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
+            }
+            finally
+            {
+                _lockProvider.Release(resourceKey);
             }
 
-            _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
-
-            return Task.FromResult(true);
+            return true;
         }
     }
 }
