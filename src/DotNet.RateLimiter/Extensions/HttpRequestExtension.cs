@@ -20,7 +20,7 @@ namespace DotNet.RateLimiter.Extensions
                 return request.Headers["X-Forwarded-For"].FirstOrDefault().GetIpAddresses().FirstOrDefault();
             }
 
-            return request.HttpContext.Connection.RemoteIpAddress.MapToIPv4();
+            return request.HttpContext.Connection.RemoteIpAddress;
         }
 
         /// <summary>

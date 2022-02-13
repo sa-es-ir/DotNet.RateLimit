@@ -5,6 +5,7 @@ using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
@@ -16,11 +17,11 @@ namespace DotNet.RateLimiter
     {
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
             services.AddScoped<RateLimitAttribute>();
 
             var options = new RateLimitOptions();
             configuration.GetSection("RateLimitOption").Bind(options);
-            services.AddSingleton(options);
 
             if (options.HasRedis)
             {

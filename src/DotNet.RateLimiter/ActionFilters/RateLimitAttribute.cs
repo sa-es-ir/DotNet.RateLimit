@@ -45,7 +45,6 @@ namespace DotNet.RateLimiter.ActionFilters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-
             try
             {
                 if (!_options.Value.EnableRateLimit)
@@ -55,6 +54,12 @@ namespace DotNet.RateLimiter.ActionFilters
                 }
 
                 var userIp = context.HttpContext.Request.GetUserIp().ToString();
+
+                if (_options.Value.IpWhiteList.Contains(userIp))
+                {
+                    await next.Invoke();
+                    return;
+                }
 
                 var userKey = string.IsNullOrWhiteSpace(UserIdentifier)
                     ? userIp
