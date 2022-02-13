@@ -27,7 +27,7 @@ namespace DotNet.RateLimiter.ActionFilters
         public int VaryByParamsLimit { get; set; }
 
         /// <summary>
-        /// if scope set to Controller, the rate limit will set to all actions and won't consider action limit, default is Action.
+        /// if scope set to Controller, the rate limit will work for entire controller no matter which action calls and won't consider action limit, default is Action.
         /// </summary>
         public RateLimitScope Scope { get; set; } = RateLimitScope.Action;
 
