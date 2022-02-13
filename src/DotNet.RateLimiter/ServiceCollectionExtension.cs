@@ -1,9 +1,13 @@
-﻿using DotNet.RateLimiter.ActionFilters;
+﻿using System.Collections.Generic;
+using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Implementations;
 using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RedLockNet;
+using RedLockNet.SERedis;
+using RedLockNet.SERedis.Configuration;
 using StackExchange.Redis;
 
 namespace DotNet.RateLimiter
@@ -12,11 +16,11 @@ namespace DotNet.RateLimiter
     {
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
             services.AddScoped<RateLimitAttribute>();
 
             var options = new RateLimitOptions();
-            configuration.GetSection("RateLimitOptions").Bind(options);
+            configuration.GetSection("RateLimitOption").Bind(options);
+            services.AddSingleton(options);
 
             if (options.HasRedis)
             {
@@ -25,9 +29,20 @@ namespace DotNet.RateLimiter
                 services.AddHostedService<QueuedHostedService>();
 
                 //configure redis 
-                var redisConfig = ConfigurationOptions.Parse(configuration["RateLimitOption:RedisConnection"]);
+                var redisConfig = ConfigurationOptions.Parse(options.RedisConnection);
                 services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
                 services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+
+                //add red lock for distributed lock
+                services.AddSingleton<IDistributedLockFactory>(provider =>
+                {
+                    var config = ConfigurationOptions.Parse(options.RedisConnection);
+
+                    return RedLockFactory.Create(new List<RedLockMultiplexer>()
+                    {
+                        ConnectionMultiplexer.Connect(config)
+                    });
+                });
             }
             else
             {
