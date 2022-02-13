@@ -16,10 +16,21 @@ namespace DotNet.RateLimiter.ActionFilters
         /// period of time in seconds for rate limit
         /// </summary>
         public int PeriodInSec { get; set; }
+
+        /// <summary>
+        /// limit of requests
+        /// </summary>
         public int Limit { get; set; }
-        public string VaryByParams { get; set; }
-        public int VaryByParamsPeriodInSec { get; set; }
-        public int VaryByParamsLimit { get; set; }
+
+        /// <summary>
+        /// seek in route parameters and check rate limit for specific params, for multiple parameters separate them by comma (,)
+        /// </summary>
+        public string RouteParams { get; set; }
+
+        /// <summary>
+        /// seek in query string parameters and check rate limit for specific params, for multiple parameters separate them by comma (,)
+        /// </summary>
+        public string QueryParams { get; set; }
 
         /// <summary>
         /// if scope set to Controller, the rate limit will work for entire controller no matter which action calls and won't consider action limit, default is Action.
@@ -33,9 +44,8 @@ namespace DotNet.RateLimiter.ActionFilters
             filter.Order = Order;
             filter.PeriodInSec = PeriodInSec;
             filter.Limit = Limit;
-            filter.VaryByParams = VaryByParams;
-            filter.VaryByParamsPeriodInSec = VaryByParamsPeriodInSec;
-            filter.VaryByParamsLimit = VaryByParamsLimit;
+            filter.RouteParams = RouteParams;
+            filter.QueryParams = QueryParams;
             filter.Scope = Scope;
 
             return filter;

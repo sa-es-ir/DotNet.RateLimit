@@ -5,6 +5,7 @@ using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -27,9 +28,8 @@ namespace DotNet.RateLimiter.ActionFilters
         public int Order { get; set; }
         public int PeriodInSec { get; set; }
         public int Limit { get; set; }
-        public string VaryByParams { get; set; }
-        public int VaryByParamsPeriodInSec { get; set; }
-        public int VaryByParamsLimit { get; set; }
+        public string RouteParams { get; set; }
+        public string QueryParams { get; set; }
         public RateLimitScope Scope { get; set; }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -65,22 +65,43 @@ namespace DotNet.RateLimiter.ActionFilters
                     rateLimitKey = $"{rateLimitKey}:{action}";
 
                 bool hasAccess = await _rateLimitService.HasAccessAsync(rateLimitKey, PeriodInSec, Limit);
-                if (hasAccess && !string.IsNullOrWhiteSpace(VaryByParams))
-                {
-                    var parameters = VaryByParams.Split(',');
+                var paramsKey = "";
 
-                    var paramsKey = "";
+                if (!string.IsNullOrEmpty(RouteParams))
+                {
+                    var parameters = RouteParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
                     foreach (var parameter in parameters)
                     {
-                        if (context.ActionArguments.ContainsKey(parameter))
-                            paramsKey += $"{context.ActionArguments[parameter]}:";
+                        if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
+                            paramsKey += $"{routeValue}:";
                     }
-
-                    if (!string.IsNullOrWhiteSpace(paramsKey) &&
-                        !await _rateLimitService.HasAccessAsync($"{rateLimitKey}:{paramsKey}", VaryByParamsPeriodInSec, VaryByParamsLimit))
-                        hasAccess = false;//Rate limit exceeded
                 }
+
+                if (!string.IsNullOrEmpty(QueryParams))
+                {
+                    var parameters = QueryParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var parameter in parameters)
+                    {
+                        if (context.HttpContext.Request.Query.TryGetValue(parameter, out _))
+                        {
+                            var items = context.HttpContext.Request.Query[parameter].ToArray();
+
+                            if (items.Length == 0)
+                                continue;
+
+                            if (items.Length == 1)
+                                paramsKey += $"{items[0]}:";
+                            else
+                                paramsKey += string.Join(":", items);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(paramsKey) &&
+                    !await _rateLimitService.HasAccessAsync($"{rateLimitKey}:{paramsKey}", PeriodInSec, Limit))
+                    hasAccess = false;//Rate limit exceeded
 
                 if (!hasAccess)
                 {
