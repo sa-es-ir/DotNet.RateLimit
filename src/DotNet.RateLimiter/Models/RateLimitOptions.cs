@@ -4,6 +4,10 @@ namespace DotNet.RateLimiter.Models
 {
     public class RateLimitOptions
     {
+        public RateLimitOptions()
+        {
+            IpWhiteList = new List<string>();
+        }
         /// <summary>
         /// if false will bypass all requests, default is true.
         /// </summary>
@@ -33,6 +37,8 @@ namespace DotNet.RateLimiter.Models
         /// list of Ips that rate limit will by-pass for them
         /// </summary>
         public List<string> IpWhiteList { get; set; }
+
+        public string IpHeaderName { get; set; } = "X-Forwarded-For";
 
     }
 }

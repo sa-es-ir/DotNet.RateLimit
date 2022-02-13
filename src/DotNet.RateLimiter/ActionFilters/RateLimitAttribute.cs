@@ -53,7 +53,7 @@ namespace DotNet.RateLimiter.ActionFilters
                     return;
                 }
 
-                var userIp = context.HttpContext.Request.GetUserIp().ToString();
+                var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName).ToString();
 
                 if (_options.Value.IpWhiteList.Contains(userIp))
                 {

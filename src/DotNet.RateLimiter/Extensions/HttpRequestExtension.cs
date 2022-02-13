@@ -8,16 +8,17 @@ namespace DotNet.RateLimiter.Extensions
 {
     public static class HttpRequestExtension
     {
-        public static string GetUserAgent(this HttpRequest request)
+        /// <summary>
+        /// get current user Ip address based on header name
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="headerName"></param>
+        /// <returns></returns>
+        public static IPAddress GetUserIp(this HttpRequest request, string headerName)
         {
-            return request.Headers["User-Agent"].ToString();
-        }
-
-        public static IPAddress GetUserIp(this HttpRequest request)
-        {
-            if (request.Headers["X-Forwarded-For"].FirstOrDefault() != null)
+            if (request.Headers[headerName].FirstOrDefault() != null)
             {
-                return request.Headers["X-Forwarded-For"].FirstOrDefault().GetIpAddresses().FirstOrDefault();
+                return request.Headers[headerName].FirstOrDefault().GetIpAddresses().FirstOrDefault();
             }
 
             return request.HttpContext.Connection.RemoteIpAddress;
