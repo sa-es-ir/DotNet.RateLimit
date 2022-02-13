@@ -12,9 +12,9 @@ namespace DotNet.RateLimiter.Demo.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        [RateLimit(PeriodInSec = 60, Limit = 5)]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("GetWeatherForecast/{id}")]
+        [RateLimit(PeriodInSec = 60, Limit = 5, RouteParams = "id", QueryParams = "name,family")]
+        public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<string> family)
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
