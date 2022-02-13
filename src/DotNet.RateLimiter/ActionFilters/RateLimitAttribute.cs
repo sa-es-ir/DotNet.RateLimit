@@ -25,7 +25,7 @@ namespace DotNet.RateLimiter.ActionFilters
         }
 
         /// <summary>
-        /// order execution of 
+        /// order execution
         /// </summary>
         public int Order { get; set; }
 
@@ -42,6 +42,7 @@ namespace DotNet.RateLimiter.ActionFilters
         public string VaryByParams { get; set; }
         public int VaryByParamsPeriodInSec { get; set; }
         public int VaryByParamsLimit { get; set; }
+        public RateLimitScope Scope { get; set; }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
@@ -68,7 +69,12 @@ namespace DotNet.RateLimiter.ActionFilters
                 var controller = context.ActionDescriptor.RouteValues["Controller"];
                 var action = context.ActionDescriptor.RouteValues["Action"];
 
-                bool hasAccess = await _rateLimitService.HasAccessAsync($"{userKey}:{controller}:{action}", PeriodInSec, Limit);
+                var rateLimitKey = $"{userKey}:{controller}";
+
+                if (Scope == RateLimitScope.Action)
+                    rateLimitKey = $"{rateLimitKey}:{action}";
+
+                bool hasAccess = await _rateLimitService.HasAccessAsync(rateLimitKey, PeriodInSec, Limit);
                 if (hasAccess && !string.IsNullOrWhiteSpace(VaryByParams))
                 {
                     var parameters = VaryByParams.Split(',');
@@ -82,7 +88,7 @@ namespace DotNet.RateLimiter.ActionFilters
                     }
 
                     if (!string.IsNullOrWhiteSpace(paramsKey) &&
-                        !await _rateLimitService.HasAccessAsync($"{userKey}:{controller}:{action}:{paramsKey}", VaryByParamsPeriodInSec, VaryByParamsLimit))
+                        !await _rateLimitService.HasAccessAsync($"{rateLimitKey}:{paramsKey}", VaryByParamsPeriodInSec, VaryByParamsLimit))
                         hasAccess = false;//Rate limit exceeded
                 }
 
