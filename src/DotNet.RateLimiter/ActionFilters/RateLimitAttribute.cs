@@ -36,14 +36,17 @@ namespace DotNet.RateLimiter.ActionFilters
         {
             try
             {
+                //bypass request if rate limit was disable
                 if (!_options.Value.EnableRateLimit)
                 {
                     await next.Invoke();
                     return;
                 }
 
+                //get current user IP based on header name
                 var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName).ToString();
 
+                //skip rate limit if IP is in white list
                 if (_options.Value.IpWhiteList.Contains(userIp))
                 {
                     await next.Invoke();
@@ -54,18 +57,22 @@ namespace DotNet.RateLimiter.ActionFilters
 
                 if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) &&
                     context.HttpContext.Request.Headers.TryGetValue(_options.Value.ClientIdentifier, out var clientId))
+                {
+                    //skip rate limit for client identifiers in white list
+                    if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
+                        return;
+
                     requestKey = clientId.ToString();
+                }
 
                 var controller = context.ActionDescriptor.RouteValues["Controller"];
                 var action = context.ActionDescriptor.RouteValues["Action"];
 
                 var rateLimitKey = $"{requestKey}:{controller}";
 
+                //if scope is action then add action name to the key
                 if (Scope == RateLimitScope.Action)
                     rateLimitKey = $"{rateLimitKey}:{action}";
-
-                bool hasAccess = await _rateLimitService.HasAccessAsync(rateLimitKey, PeriodInSec, Limit);
-                var paramsKey = "";
 
                 if (!string.IsNullOrEmpty(RouteParams))
                 {
@@ -74,7 +81,7 @@ namespace DotNet.RateLimiter.ActionFilters
                     foreach (var parameter in parameters)
                     {
                         if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
-                            paramsKey += $"{routeValue}:";
+                            rateLimitKey += $"{routeValue}:";
                     }
                 }
 
@@ -88,20 +95,22 @@ namespace DotNet.RateLimiter.ActionFilters
                         {
                             var items = context.HttpContext.Request.Query[parameter].ToArray();
 
-                            if (items.Length == 0)
-                                continue;
-
-                            if (items.Length == 1)
-                                paramsKey += $"{items[0]}:";
-                            else
-                                paramsKey += string.Join(":", items);
+                            switch (items.Length)
+                            {
+                                case 0:
+                                    continue;
+                                case 1:
+                                    rateLimitKey += $"{items[0]}:";
+                                    break;
+                                default:
+                                    rateLimitKey += string.Join(":", items);
+                                    break;
+                            }
                         }
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(paramsKey) &&
-                    !await _rateLimitService.HasAccessAsync($"{rateLimitKey}:{paramsKey}", PeriodInSec, Limit))
-                    hasAccess = false;//Rate limit exceeded
+                var hasAccess = await _rateLimitService.HasAccessAsync(rateLimitKey, PeriodInSec, Limit);
 
                 if (!hasAccess)
                 {

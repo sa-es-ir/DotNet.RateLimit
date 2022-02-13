@@ -48,5 +48,10 @@ namespace DotNet.RateLimiter.Models
         /// </summary>
         public string ClientIdentifier { get; set; }
 
+        /// <summary>
+        /// list of client identifiers that rate limit will by-pass for them
+        /// </summary>
+        public List<string> ClientIdentifierWhiteList { get; set; }
+
     }
 }
