@@ -13,11 +13,6 @@ namespace DotNet.RateLimiter.ActionFilters
         public int Order { get; set; }
 
         /// <summary>
-        /// by default rate limit work on IP address but if userIdentifier set it will look at HttpContext.Items[UserIdentifier]
-        /// </summary>
-        public string UserIdentifier { get; set; }
-
-        /// <summary>
         /// period of time in seconds for rate limit
         /// </summary>
         public int PeriodInSec { get; set; }
@@ -36,12 +31,12 @@ namespace DotNet.RateLimiter.ActionFilters
             var filter = serviceProvider.GetRequiredService<RateLimitAttribute>();
 
             filter.Order = Order;
-            filter.UserIdentifier = UserIdentifier;
             filter.PeriodInSec = PeriodInSec;
             filter.Limit = Limit;
             filter.VaryByParams = VaryByParams;
             filter.VaryByParamsPeriodInSec = VaryByParamsPeriodInSec;
             filter.VaryByParamsLimit = VaryByParamsLimit;
+            filter.Scope = Scope;
 
             return filter;
         }

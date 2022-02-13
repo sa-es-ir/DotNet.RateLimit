@@ -38,7 +38,15 @@ namespace DotNet.RateLimiter.Models
         /// </summary>
         public List<string> IpWhiteList { get; set; }
 
+        /// <summary>
+        /// consider how retrieve IP address from request header default is X-Forwarded-For.
+        /// </summary>
         public string IpHeaderName { get; set; } = "X-Forwarded-For";
+
+        /// <summary>
+        /// by default rate limit work on IP address but if userIdentifier set it will look at request header to get client identifier
+        /// </summary>
+        public string ClientIdentifier { get; set; }
 
     }
 }

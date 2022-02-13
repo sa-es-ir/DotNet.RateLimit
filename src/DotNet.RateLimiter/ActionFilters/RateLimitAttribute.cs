@@ -24,19 +24,7 @@ namespace DotNet.RateLimiter.ActionFilters
             _options = options;
         }
 
-        /// <summary>
-        /// order execution
-        /// </summary>
         public int Order { get; set; }
-
-        /// <summary>
-        /// by default rate limit work on IP address but if userIdentifier set it will look at HttpContext.Items[UserIdentifier]
-        /// </summary>
-        public string UserIdentifier { get; set; }
-
-        /// <summary>
-        /// period of time in seconds for rate limit
-        /// </summary>
         public int PeriodInSec { get; set; }
         public int Limit { get; set; }
         public string VaryByParams { get; set; }
@@ -62,14 +50,16 @@ namespace DotNet.RateLimiter.ActionFilters
                     return;
                 }
 
-                var userKey = string.IsNullOrWhiteSpace(UserIdentifier)
-                    ? userIp
-                    : context.HttpContext.Items[UserIdentifier].ToString();
+                var requestKey = userIp;
+
+                if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) &&
+                    context.HttpContext.Request.Headers.TryGetValue(_options.Value.ClientIdentifier, out var clientId))
+                    requestKey = clientId.ToString();
 
                 var controller = context.ActionDescriptor.RouteValues["Controller"];
                 var action = context.ActionDescriptor.RouteValues["Action"];
 
-                var rateLimitKey = $"{userKey}:{controller}";
+                var rateLimitKey = $"{requestKey}:{controller}";
 
                 if (Scope == RateLimitScope.Action)
                     rateLimitKey = $"{rateLimitKey}:{action}";
