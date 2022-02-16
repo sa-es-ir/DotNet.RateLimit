@@ -35,12 +35,11 @@ namespace DotNet.RateLimiter.ActionFilters
         /// <summary>
         /// if scope set to Controller, the rate limit will work for entire controller no matter which action calls and won't consider action limit, default is Action.
         /// </summary>
-        public RateLimitScope Scope { get; set; } = RateLimitScope.Action;
+        public RateLimitScope Scope { get; set; }
 
         public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
         {
             var filter = serviceProvider.GetRequiredService<RateLimitAttribute>();
-
             filter.Order = Order;
             filter.PeriodInSec = PeriodInSec;
             filter.Limit = Limit;

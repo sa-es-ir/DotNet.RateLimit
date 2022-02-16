@@ -18,7 +18,7 @@ namespace DotNet.RateLimiter
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
-            services.AddScoped<RateLimitAttribute>();
+            services.AddTransient<RateLimitAttribute>();
 
             var options = new RateLimitOptions();
             configuration.GetSection("RateLimitOption").Bind(options);
