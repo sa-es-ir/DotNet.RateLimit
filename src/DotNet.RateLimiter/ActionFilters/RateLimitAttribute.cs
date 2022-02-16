@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.Extensions;
 using DotNet.RateLimiter.Interfaces;
@@ -65,50 +66,15 @@ namespace DotNet.RateLimiter.ActionFilters
                     requestKey = clientId.ToString();
                 }
 
-                var controller = context.ActionDescriptor.RouteValues["Controller"];
-                var action = context.ActionDescriptor.RouteValues["Action"];
-
-                var rateLimitKey = $"{requestKey}:{controller}";
-
-                //if scope is action then add action name to the key
-                if (Scope == RateLimitScope.Action)
-                    rateLimitKey = $"{rateLimitKey}:{action}";
-
-                if (!string.IsNullOrEmpty(RouteParams))
+                //if action had ignored rate limit then skip it
+                var filters = context.Filters;
+                if (filters.OfType<IIgnoreRateLimitFilter>().Any())
                 {
-                    var parameters = RouteParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (var parameter in parameters)
-                    {
-                        if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
-                            rateLimitKey += $"{routeValue}:";
-                    }
+                    await next.Invoke();
+                    return;
                 }
 
-                if (!string.IsNullOrEmpty(QueryParams))
-                {
-                    var parameters = QueryParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (var parameter in parameters)
-                    {
-                        if (context.HttpContext.Request.Query.TryGetValue(parameter, out _))
-                        {
-                            var items = context.HttpContext.Request.Query[parameter].ToArray();
-
-                            switch (items.Length)
-                            {
-                                case 0:
-                                    continue;
-                                case 1:
-                                    rateLimitKey += $"{items[0]}:";
-                                    break;
-                                default:
-                                    rateLimitKey += string.Join(":", items);
-                                    break;
-                            }
-                        }
-                    }
-                }
+                var rateLimitKey = ProvideRateLimitKey(context, requestKey);
 
                 var hasAccess = await _rateLimitService.HasAccessAsync(rateLimitKey, PeriodInSec, Limit);
 
@@ -134,6 +100,58 @@ namespace DotNet.RateLimiter.ActionFilters
                 _logger.LogCritical(e, e.Message);
                 await next.Invoke();
             }
+        }
+
+        private string ProvideRateLimitKey(ActionExecutingContext context, string requestKey)
+        {
+            //get controller and action name
+            var controller = context.ActionDescriptor.RouteValues["Controller"];
+            var action = context.ActionDescriptor.RouteValues["Action"];
+
+            var rateLimitKey = $"{requestKey}:{controller}";
+
+            //if scope is action then add action name to the key to consider each action separately
+            if (Scope == RateLimitScope.Action)
+                rateLimitKey = $"{rateLimitKey}:{action}";
+
+
+            if (!string.IsNullOrEmpty(RouteParams))
+            {
+                var parameters = RouteParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var parameter in parameters)
+                {
+                    if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
+                        rateLimitKey += $"{routeValue}:";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(QueryParams))
+            {
+                var parameters = QueryParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var parameter in parameters)
+                {
+                    if (context.HttpContext.Request.Query.TryGetValue(parameter, out _))
+                    {
+                        var items = context.HttpContext.Request.Query[parameter].ToArray();
+
+                        switch (items.Length)
+                        {
+                            case 0:
+                                continue;
+                            case 1:
+                                rateLimitKey += $"{items[0]}:";
+                                break;
+                            default:
+                                rateLimitKey += string.Join(":", items);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return rateLimitKey;
         }
     }
 }
