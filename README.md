@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRateLimitService(builder.Configuration);
 ```
 ## How to use
-You can see the **Demo** project and see how to use in code.
+You can see the **Demo** project to know how to use in all scenarios.
 ### Simple use
 Use RateLimit with any parameters
 ```csharp
@@ -28,5 +28,14 @@ Use RateLimit with any parameters
 public IEnumerable<WeatherForecast> Get()
 {
     ....
+}
+```
+### Use with Route parameters
+```csharp
+[HttpGet("by-route/{id}")]
+[RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id")]
+public IEnumerable<WeatherForecast> Get(int id)
+{
+   ....
 }
 ```
