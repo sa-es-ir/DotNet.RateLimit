@@ -117,7 +117,7 @@ namespace DotNet.RateLimiter.ActionFilters
 
             if (!string.IsNullOrEmpty(RouteParams))
             {
-                var parameters = RouteParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var parameters = RouteParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var parameter in parameters)
                 {
@@ -128,7 +128,7 @@ namespace DotNet.RateLimiter.ActionFilters
 
             if (!string.IsNullOrEmpty(QueryParams))
             {
-                var parameters = QueryParams.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var parameters = QueryParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var parameter in parameters)
                 {
