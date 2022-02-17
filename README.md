@@ -2,7 +2,7 @@
 
 This is a RateLimit that works with ActionFilters! The approach designed to control requests rate for specific Action or Controller. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with action filters you can limit some of the critical endpoints.
 
-Rate Limit uses InMemory cache by default, but if you set up a Redis connection it will use Redis, it is recommended that use Redis to check the rate limit in distributed applications.
+Rate Limit uses InMemory cache by default, but if you set up a Redis connection it will use Redis, it is recommended that use Redis to check the rate limit in distributed applications. By default it limits the IP address for control requests rate but you can set ClientId in request headers the header name is configurable.
 
 
 |Platform|Version|
@@ -37,5 +37,14 @@ public IEnumerable<WeatherForecast> Get()
 public IEnumerable<WeatherForecast> Get(int id)
 {
    ....
+}
+```
+### Use with Query parameters
+```csharp
+[HttpGet("by-query/{id}")]
+[RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id", QueryParams = "name,family")]
+public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<string> family)
+{
+    ....
 }
 ```
