@@ -11,7 +11,7 @@ Rate Limit uses InMemory cache by default, but if you set up a Redis connection 
 
 ## How to add in DI
 RateLimitOption in appsettings.json
-```json
+```csharp
 "RateLimitOption": {
     "EnableRateLimit": true, //Optional: if set false rate limit will disable, default is true
     "HttpStatusCode": 429, //Optional: default is 429
