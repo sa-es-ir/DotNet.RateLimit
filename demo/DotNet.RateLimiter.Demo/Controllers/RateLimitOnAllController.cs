@@ -5,7 +5,9 @@ namespace DotNet.RateLimiter.Demo.Controllers
 {
     [ApiController]
     [Route("rate-limit-on-controller")]
-    [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]//set Scope to rate limit on all actions
+    //if set Scope to Controller to rate limit on all actions no matter which actions call
+    //the default value is Action means this rate limit check for each action separately
+    [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
     public class RateLimitOnAllController : ControllerBase
     {
         private static readonly string[] Summaries = {
