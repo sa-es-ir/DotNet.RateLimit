@@ -10,6 +10,19 @@ Rate Limit uses InMemory cache by default, but if you set up a Redis connection 
 |TargetFramework| **net6.0**, **netstandard2.1** |
 
 ## How to add in DI
+RateLimitOption in appsettings.json
+```json
+"RateLimitOption": {
+    "EnableRateLimit": true, //Optional: if set false rate limit will disable, default is true
+    "HttpStatusCode": 429, //Optional: default is 429
+    "ErrorMessage": "Rate limit Exceeded", //Optional: default is Rate limit Exceeded
+    "IpHeaderName": "X-Forwarded-For" //Optional: header name for get Ip address, default is X-Forwarded-For
+    //"RedisConnection": "127.0.0.1:6379",
+    //"IpWhiteList": ["::1"],
+    //"ClientIdentifier": "X-Client-Id" // for get client id from request header if this present the rate limit will not use IP for limit requests
+    //"ClientIdentifierWhiteList": ["test-client"]
+  }
+```
 You can add RateLimit in Startup like this:
 ```csharp
 using DotNet.RateLimiter;
