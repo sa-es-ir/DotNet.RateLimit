@@ -7,7 +7,7 @@ Rate Limit uses InMemory cache by default, but if you set up a Redis connection 
 
 |Platform|Version|
 |---|---|
-|TargetFramework| **net6.0**, **netstandard2.1** |
+|TargetFramework| **net6.0**, **netstandard2.1**; **netstandard2.0**; **net5**; **netcoreapp3.1**|
 
 ## How to add in DI
 RateLimitOption in appsettings.json
