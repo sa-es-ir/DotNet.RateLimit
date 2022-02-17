@@ -32,7 +32,7 @@ namespace DotNet.RateLimiter.Implementations
                 var cacheEntry = new InMemoryRateLimitEntry()
                 {
                     Expiration = DateTime.UtcNow,
-                    Total = 1
+                    Total = 0
                 };
 
                 if (_memoryCache.TryGetValue(resourceKey, out InMemoryRateLimitEntry entry))
@@ -45,15 +45,15 @@ namespace DotNet.RateLimiter.Implementations
                             Total = entry.Total + 1
                         };
 
-                        _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
-
                         //rate limit exceeded
-                        if (cacheEntry.Total > limit)
+                        if (cacheEntry.Total >= limit)
                         {
                             _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{cacheEntry.Total}");
 
                             return false;
                         }
+
+                        _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
 
                         return true;
                     }
