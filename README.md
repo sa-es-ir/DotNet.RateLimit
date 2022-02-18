@@ -34,7 +34,7 @@ builder.Services.AddRateLimitService(builder.Configuration);
 ## How to use
 You can see the **Demo** project to know how to use in all scenarios.
 ### Simple use
-Use RateLimit with any parameters
+Use RateLimit without any parameters
 ```csharp
 [HttpGet("")]
 [RateLimit(PeriodInSec = 60, Limit = 3)]
