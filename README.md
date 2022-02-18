@@ -1,9 +1,10 @@
-# DotNet.RateLimiter
+# DotNetRateLimiter
 
 This is a RateLimit that works with ActionFilters! The approach designed to control requests rate for specific Action or Controller. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with action filters you can limit some of the critical endpoints.
 
 Rate Limit uses InMemory cache by default, but if you set up a Redis connection it will use Redis, it is recommended that use Redis to check the rate limit in distributed applications. By default it limits the IP address for control requests rate but you can set ClientId in request headers the header name is configurable.
 
+[![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 
 |Platform|Version|
 |---|---|
