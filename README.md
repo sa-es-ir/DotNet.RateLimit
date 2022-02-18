@@ -5,10 +5,16 @@ This is a RateLimit that works with ActionFilters! The approach designed to cont
 Rate Limit uses InMemory cache by default, but if you set up a Redis connection it will use Redis, it is recommended that use Redis to check the rate limit in distributed applications. By default it limits the IP address for control requests rate but you can set ClientId in request headers the header name is configurable.
 
 [![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
+[![GitHub stars](https://img.shields.io/github/stars/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/network)
 
-|Platform|Version|
+|TargetFramework|Support|
 |---|---|
-|TargetFramework| **net6.0**, **netstandard2.1**; **netstandard2.0**; **net5**; **netcoreapp3.1**|
+|**net6.0**|:white_check_mark:|
+|**net5.0**|:white_check_mark:|
+|**netcoreapp3.1**|:white_check_mark:|
+|**netstandard2.1**|:white_check_mark:|
+|**netstandard2.0**|:white_check_mark:|
 
 ## How to add in DI
 RateLimitOption in appsettings.json
