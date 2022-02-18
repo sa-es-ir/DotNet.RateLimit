@@ -23,7 +23,7 @@ Rate Limit uses InMemory cache by default, but if you set up a Redis connection 
 RateLimitOption in appsettings.json
 ```csharp
 "RateLimitOption": {
-    "EnableRateLimit": true, //Optional: if set false rate limit will disable, default is true
+    "EnableRateLimit": true, //Optional: if set false rate limit will be disabled, default is true
     "HttpStatusCode": 429, //Optional: default is 429
     "ErrorMessage": "Rate limit Exceeded", //Optional: default is Rate limit Exceeded
     "IpHeaderName": "X-Forwarded-For" //Optional: header name for get Ip address, default is X-Forwarded-For
