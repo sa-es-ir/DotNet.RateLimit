@@ -27,10 +27,10 @@ RateLimitOption in appsettings.json
     "HttpStatusCode": 429, //Optional: default is 429
     "ErrorMessage": "Rate limit Exceeded", //Optional: default is Rate limit Exceeded
     "IpHeaderName": "X-Forwarded-For" //Optional: header name for get Ip address, default is X-Forwarded-For
-    //"RedisConnection": "127.0.0.1:6379",
-    //"IpWhiteList": ["::1"],
-    //"ClientIdentifier": "X-Client-Id" // for get client id from request header if this present the rate limit will not use IP for limit requests
-    //"ClientIdentifierWhiteList": ["test-client"]
+    "RedisConnection": "127.0.0.1:6379", //Optional
+    "IpWhiteList": ["::1"], //Optional
+    "ClientIdentifier": "X-Client-Id" ////Optional: for getting client id from request header if this present the rate limit will not use IP for limit requests
+    "ClientIdentifierWhiteList": ["test-client"] ////Optional
   }
 ```
 You can add RateLimit in Startup like this:
@@ -69,5 +69,26 @@ public IEnumerable<WeatherForecast> Get(int id)
 public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<string> family)
 {
     ....
+}
+```
+### Use on Controller
+```csharp
+//if Scope set to Controller to rate limit work on all actions no matter which actions call
+//the default value is Action means this rate limit check for each action separately
+[RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
+public class RateLimitOnAllController : ControllerBase
+{ .... }
+```
+### Ignore rate limit in case of use on Controller
+```csharp
+ [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
+public class RateLimitOnAllController : ControllerBase
+{
+    [HttpGet("")]
+    [IgnoreRateLimit]//ignore rate limit for this action
+    public IEnumerable<WeatherForecast> Get()
+    {
+      ....
+    }
 }
 ```
