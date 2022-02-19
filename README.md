@@ -81,7 +81,7 @@ public class RateLimitOnAllController : ControllerBase
 ```
 ### Ignore rate limit in case of use on Controller
 ```csharp
- [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
+[RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
 public class RateLimitOnAllController : ControllerBase
 {
     [HttpGet("")]
