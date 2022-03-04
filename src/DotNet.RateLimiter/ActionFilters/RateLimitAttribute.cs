@@ -45,7 +45,7 @@ namespace DotNet.RateLimiter.ActionFilters
                 }
 
                 //get current user IP based on header name
-                var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName).ToString();
+                var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName)?.ToString();
 
                 //skip rate limit if IP is in white list
                 if (_options.Value.IpWhiteList.Contains(userIp))
@@ -105,8 +105,8 @@ namespace DotNet.RateLimiter.ActionFilters
         private string ProvideRateLimitKey(ActionExecutingContext context, string requestKey)
         {
             //get controller and action name
-            var controller = context.ActionDescriptor.RouteValues["Controller"];
-            var action = context.ActionDescriptor.RouteValues["Action"];
+            context.ActionDescriptor.RouteValues.TryGetValue("Controller", out var controller);
+            context.ActionDescriptor.RouteValues.TryGetValue("Action", out var action);
 
             var rateLimitKey = $"{requestKey}:{controller}";
 
