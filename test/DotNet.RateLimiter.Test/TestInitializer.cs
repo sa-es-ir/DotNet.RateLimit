@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Interfaces;
@@ -28,22 +29,35 @@ public class TestInitializer
     public static ActionContext SetupActionContext(string ipHeaderName = "X-Forwarded-For",
         string ip = "127.0.0.1",
         string controllerName = "TestController",
-        string actionName = "TestAction")
+        string actionName = "TestAction",
+        Dictionary<string, object?>? routeParams = null,
+        Dictionary<string, object>? queryParams = null)
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.TryAdd(ipHeaderName, ip);
 
-        return new ActionContext(httpContext,
-            new RouteData(),
-            new ActionDescriptor()
+        if (routeParams != null && routeParams.Any())
+            foreach (var routeParam in routeParams)
+                httpContext.GetRouteData().Values.TryAdd(routeParam.Key, routeParam.Value);
+
+        if (queryParams != null && queryParams.Any())
+            foreach (var queryParam in queryParams)
             {
-                RouteValues = new Dictionary<string, string?>()
-                {
-                    {"Controller", controllerName},
-                    {"Action", actionName}
-                }
-            },
-            new ModelStateDictionary());
+                httpContext.Request.QueryString = httpContext.Request.QueryString.Add(queryParam.Key, queryParam.Value?.ToString() ?? "test");
+            }
+
+
+        return new ActionContext(httpContext,
+             new RouteData(),
+             new ActionDescriptor()
+             {
+                 RouteValues = new Dictionary<string, string?>()
+                 {
+                     { "Controller", controllerName },
+                     { "Action", actionName }
+                 }
+             },
+             new ModelStateDictionary());
 
 
     }

@@ -1,33 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using DotNet.RateLimiter.ActionFilters;
-using DotNet.RateLimiter.Interfaces;
-using DotNet.RateLimiter.Models;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Xunit;
-using Xunit.DependencyInjection;
 
 namespace DotNet.RateLimiter.Test;
-
-[Startup(typeof(Startup))]
-public class InMemoryRateLimitTest : BaseRateLimitTest
-{
-    public InMemoryRateLimitTest(IServiceScopeFactory scopeFactory) : base(scopeFactory)
-    {
-    }
-}
 
 public class BaseRateLimitTest
 {
