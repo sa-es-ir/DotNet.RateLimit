@@ -21,3 +21,18 @@ public class Startup
         });
 
 }
+
+public class StartupRedis
+{
+    public void ConfigureServices(IServiceCollection services, HostBuilderContext context)
+    {
+        services.AddRateLimitService(context.Configuration);
+    }
+
+    public void ConfigureHost(IHostBuilder hostBuilder) =>
+        hostBuilder.ConfigureAppConfiguration((_, builder) =>
+        {
+            builder.AddJsonFile("appsettings_redis.json");
+        });
+
+}
