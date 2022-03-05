@@ -9,9 +9,15 @@
 
 	<ItemGroup>
 		<None Remove="appsettings.json" />
+		<None Remove="appsettings_redis.json" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="appsettings_redis.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
