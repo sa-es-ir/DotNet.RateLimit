@@ -10,6 +10,3 @@ branches:
   - main
 nuget:
   disable_publish_on_pr: true
-artifacts:
-- path: .\artifacts\*.nupkg
-  name: RateLimitNuget
