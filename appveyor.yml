@@ -1,0 +1,13 @@
+version: '{build}'
+os: Visual Studio 2022
+configuration : Release
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - main
+nuget:
+  disable_publish_on_pr: true
+artifacts:
+- path: .\artifacts\*.nupkg
+  name: RateLimitNuget
