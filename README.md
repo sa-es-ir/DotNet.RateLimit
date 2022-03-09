@@ -7,6 +7,7 @@ This is a RateLimit that works with ActionFilters! An approach designed to contr
 
 Rate Limit uses InMemory cache by default, but if you set up a Redis connection it will use Redis, it is recommended that use Redis to check the rate limit in distributed applications. By default it limits the IP address for control requests rate but you can set ClientId in request headers the header name is configurable.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/9i2u298skqni6s3g?svg=true)](https://ci.appveyor.com/project/SaeedEsmaeelinejad/dotnet-ratelimit)
 [![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![GitHub stars](https://img.shields.io/github/stars/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/network)
