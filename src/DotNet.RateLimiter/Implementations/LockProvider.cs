@@ -9,13 +9,13 @@ namespace DotNet.RateLimiter.Implementations
     /// A LockProvider based upon the SemaphoreSlim class to selectively lock objects, resources or statement blocks 
     /// according to given unique IDs in a sync or async way.
     /// 
-    /// SAMPLE USAGE & ADDITIONAL INFO:
+    /// SAMPLE USAGE and ADDITIONAL INFO:
     /// - https://www.ryadel.com/en/asp-net-core-lock-threads-async-custom-ids-lockprovider/
     /// - https://github.com/Darkseal/LockProvider/
     /// </summary>
     public class LockProvider<T>
     {
-        static readonly LazyConcurrentDictionary<T, InnerSemaphore> LockDictionary = new LazyConcurrentDictionary<T, InnerSemaphore>();
+        private static readonly LazyConcurrentDictionary<T, InnerSemaphore> LockDictionary = new();
 
         public LockProvider() { }
 
