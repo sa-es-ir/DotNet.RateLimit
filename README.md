@@ -43,7 +43,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRateLimitService(builder.Configuration);
 ```
 ## How to use
-You can see the **Demo** project to know how to use in all scenarios.
+You can see the **Demo** project to know how to use in all scenarios and also you can follow this article in Medium.
 ### Simple use
 Use RateLimit without any parameters
 ```csharp
