@@ -164,4 +164,40 @@ public class BaseRateLimitTest
 
         actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
     }
+
+    [Theory]
+    [MemberData(nameof(TestDataProvider.TooManyRequestTestDataWithBodyParams), MemberType = typeof(TestDataProvider))]
+    public async Task ExtraRequest_WithBodyParam_Returns_TooManyRequest(int limit, int periodInSec, Dictionary<string, object?> actionArguments, HttpStatusCode expectedResult)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams: string.Join(",", actionArguments.Select(x => x.Key)));
+
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments);
+
+        var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
+
+        await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
+
+        await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
+
+        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+    }
+
+
+
+    [Theory]
+    [MemberData(nameof(TestDataProvider.OkTestDataWithBodyParams), MemberType = typeof(TestDataProvider))]
+    public async Task NormalRequest_WithBodyParam_Returns_OK(int limit, int periodInSec, Dictionary<string, object?> actionArguments, HttpStatusCode expectedResult)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams: string.Join(",", actionArguments.Select(x => x.Key)));
+
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments);
+
+        var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
+
+        await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
+
+        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+    }
 }

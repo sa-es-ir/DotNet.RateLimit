@@ -31,7 +31,8 @@ public class TestInitializer
         string controllerName = "TestController",
         string actionName = "TestAction",
         Dictionary<string, object?>? routeParams = null,
-        Dictionary<string, object>? queryParams = null)
+        Dictionary<string, object?>? queryParams = null,
+        Dictionary<string, object>? bodyParams = null)
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.TryAdd(ipHeaderName, ip);
@@ -47,17 +48,17 @@ public class TestInitializer
             }
 
 
-        return new ActionContext(httpContext,
-             new RouteData(),
-             new ActionDescriptor()
-             {
-                 RouteValues = new Dictionary<string, string?>()
-                 {
-                     { "Controller", controllerName },
-                     { "Action", actionName }
-                 }
-             },
-             new ModelStateDictionary());
+        return new ActionContext(httpContext,   
+            new RouteData(),
+            new ActionDescriptor()
+            {
+                RouteValues = new Dictionary<string, string?>()
+                {
+                    { "Controller", controllerName },
+                    { "Action", actionName }
+                }
+            },
+            new ModelStateDictionary());
 
 
     }
@@ -69,7 +70,7 @@ public class TestInitializer
     }
 
     public static RateLimitAttribute CreateRateLimitFilter(IServiceScope scopeFactory, int limit, int periodInSec, string? routeParams = null,
-        string? queryParams = null, RateLimitScope scope = RateLimitScope.Action)
+        string? queryParams = null, string? bodyParams = null, RateLimitScope scope = RateLimitScope.Action)
     {
         return new RateLimitAttribute(
             scopeFactory.ServiceProvider.GetRequiredService<ILogger<RateLimitAttribute>>(),
@@ -80,9 +81,11 @@ public class TestInitializer
             PeriodInSec = periodInSec,
             QueryParams = queryParams,
             RouteParams = routeParams,
+            BodyParams = bodyParams,
             Scope = scope
         };
     }
+
 
     public static string GetRandomIpAddress()
     {
