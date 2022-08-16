@@ -33,6 +33,11 @@ namespace DotNet.RateLimiter.ActionFilters
         public string QueryParams { get; set; }
 
         /// <summary>
+        /// seek in body parameters and check rate limit for specific params, for multiple parameters separate them by comma (,)
+        /// </summary>
+        public string BodyParams { get; set; }
+
+        /// <summary>
         /// if scope set to Controller, the rate limit will work for entire controller no matter which action calls and won't consider action limit, default is Action.
         /// </summary>
         public RateLimitScope Scope { get; set; }
@@ -45,6 +50,7 @@ namespace DotNet.RateLimiter.ActionFilters
             filter.Limit = Limit;
             filter.RouteParams = RouteParams;
             filter.QueryParams = QueryParams;
+            filter.BodyParams = BodyParams;
             filter.Scope = Scope;
 
             return filter;

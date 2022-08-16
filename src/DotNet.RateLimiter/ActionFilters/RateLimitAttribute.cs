@@ -119,23 +119,19 @@ namespace DotNet.RateLimiter.ActionFilters
             //if scope is action then add action name to the key to consider each action separately
             if (Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
-
-
+            
             if (!string.IsNullOrWhiteSpace(RouteParams))
             {
                 var parameters = RouteParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
                 foreach (var parameter in parameters)
                 {
                     if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
                         rateLimitKey.Append(routeValue);
                 }
             }
-
             if (!string.IsNullOrWhiteSpace(QueryParams))
             {
                 var parameters = QueryParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
                 foreach (var parameter in parameters)
                 {
                     if (context.HttpContext.Request.Query.TryGetValue(parameter, out _))
@@ -160,25 +156,20 @@ namespace DotNet.RateLimiter.ActionFilters
             if (!string.IsNullOrWhiteSpace(BodyParams))
             {
                 var parameters = BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-
                 var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
                 var obj = JObject.Parse(jsonSerializer);
                 var properties = obj.Descendants().OfType<JProperty>().Where(p => p.Value.Type != JTokenType.Array && p.Value.Type != JTokenType.Object).ToList();
                 foreach (var parameter in parameters)
                 {
-
                     foreach (var property in properties)
                     {
                         if (property.Name.Trim().ToLower() == parameter.Trim().ToLower())
                         {
-
                             rateLimitKey.Append(property.Value).Append(":");
                         }
                     }
                 }
             }
-
             return rateLimitKey.ToString();
         }
     }
