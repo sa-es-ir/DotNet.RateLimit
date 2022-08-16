@@ -65,5 +65,17 @@ namespace DotNet.RateLimiter.Demo.Controllers
             })
             .ToArray();
         }
+
+
+        /// <summary>
+        /// rate limit with body parameters
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
+        public IActionResult Update(WeatherForecast weatherForecast)
+        {
+            return Ok();
+        }
     }
 }
