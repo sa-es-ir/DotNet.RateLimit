@@ -69,4 +69,25 @@ public class TestDataProvider
                 },
                 HttpStatusCode.TooManyRequests }
         };
+
+    public static IEnumerable<object[]> OkTestDataWithBodyParams =>
+        new List<object[]>
+        {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+            {
+                {"id","20"},
+                {"name","rate-limit"},
+            }, HttpStatusCode.OK }
+        };
+
+
+    public static IEnumerable<object[]> TooManyRequestTestDataWithBodyParams =>
+        new List<object[]>
+        {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+            {
+                {"id","20"},
+                {"name","rate-limit"}
+            }, HttpStatusCode.TooManyRequests }
+        };
 }
