@@ -65,7 +65,10 @@ namespace DotNet.RateLimiter.ActionFilters
                 {
                     //skip rate limit for client identifiers in white list
                     if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
+                    {
+                        await next.Invoke();
                         return;
+                    }
 
                     requestKey = clientId.ToString();
                 }
@@ -119,7 +122,8 @@ namespace DotNet.RateLimiter.ActionFilters
             //if scope is action then add action name to the key to consider each action separately
             if (Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
-            
+
+
             if (!string.IsNullOrWhiteSpace(RouteParams))
             {
                 var parameters = RouteParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);

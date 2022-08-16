@@ -51,5 +51,13 @@ namespace DotNet.RateLimiter.Demo.Controllers
             })
             .ToArray();
         }
+
+
+
+        [HttpPut]
+        public IActionResult Update(WeatherForecast weatherForecast)
+        {
+            return Ok();
+        }
     }
 }

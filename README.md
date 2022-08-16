@@ -58,6 +58,16 @@ public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<st
     ....
 }
 ```
+
+### Use with Body parameters
+```csharp
+[HttpPut]
+[RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
+public IActionResult Update(WeatherForecast weatherForecast)
+{
+	....
+}
+```
 ### Use on Controller
 ```csharp
 //if Scope set to Controller to rate limit work on all actions no matter which actions call
