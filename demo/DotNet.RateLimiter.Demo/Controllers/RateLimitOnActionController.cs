@@ -72,8 +72,8 @@ namespace DotNet.RateLimiter.Demo.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
-        public IActionResult Update(WeatherForecast weatherForecast)
+        [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC")]
+        public IActionResult Update([FromBody] WeatherForecast weatherForecast)
         {
             return Ok();
         }
