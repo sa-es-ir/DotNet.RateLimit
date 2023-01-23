@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AsyncKeyedLock;
 using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,19 +12,19 @@ namespace DotNet.RateLimiter.Implementations
     {
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<InMemoryRateLimitService> _logger;
-        private readonly LockProvider<string> _lockProvider = new LockProvider<string>();
+        private readonly AsyncKeyedLocker<string> _lockProvider;
         public InMemoryRateLimitService(IMemoryCache memoryCache,
-            ILogger<InMemoryRateLimitService> logger)
+            ILogger<InMemoryRateLimitService> logger,
+            AsyncKeyedLocker<string> lockProvider)
         {
             _memoryCache = memoryCache;
             _logger = logger;
+            _lockProvider = lockProvider;
         }
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            await _lockProvider.WaitAsync(resourceKey);
-
-            try
+            using (await _lockProvider.LockAsync(resourceKey).ConfigureAwait(false))
             {
                 //if limit set to 0 or less than zero so no need to check limit and block the request
                 if (limit <= 0)
@@ -60,10 +61,6 @@ namespace DotNet.RateLimiter.Implementations
                 }
 
                 _memoryCache.Set(resourceKey, cacheEntry, TimeSpan.FromSeconds(periodInSec));
-            }
-            finally
-            {
-                _lockProvider.Release(resourceKey);
             }
 
             return true;
