@@ -74,4 +74,8 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="AsyncKeyedLock" Version="6.0.5" />
+	</ItemGroup>
+
 </Project>

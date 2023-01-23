@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AsyncKeyedLock;
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Implementations;
 using DotNet.RateLimiter.Interfaces;
@@ -48,6 +49,11 @@ namespace DotNet.RateLimiter
             else
             {
                 services.AddMemoryCache();
+                services.AddSingleton(new AsyncKeyedLocker<string>(o =>
+                {
+                    o.PoolSize = 20;
+                    o.PoolInitialFill = 1;
+                }));
                 services.AddScoped<IRateLimitService, InMemoryRateLimitService>();
             }
         }
