@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using AsyncKeyedLock;
+﻿using AsyncKeyedLock;
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Implementations;
 using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
 using StackExchange.Redis;
+using System.Collections.Generic;
 
 namespace DotNet.RateLimiter
 {
