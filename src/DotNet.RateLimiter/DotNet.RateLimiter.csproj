@@ -5,15 +5,15 @@
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<LangVersion>10</LangVersion>
 		<Authors>Saeed Esmaeelinejad</Authors>
 		<PackageId>DotNetRateLimiter</PackageId>
 		<PackageTags>aspnetcore;rate-limit;action-filters</PackageTags>
 		<PackageLicense>http://opensource.org/licenses/MIT</PackageLicense>
-		<PackageProjectUrl>https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/sa-es-ir/DotNet.RateLimit</PackageProjectUrl>
 		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit</RepositoryUrl>
+		<RepositoryUrl>https://github.com/sa-es-ir/DotNet.RateLimit</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<Description>DotNet Rate Limit by using ActionFilters for control requeste rate on Action or Controller, it supports in-memory and redis</Description>
 	</PropertyGroup>
@@ -75,7 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="AsyncKeyedLock" Version="6.0.5" />
+		<PackageReference Include="AsyncKeyedLock" Version="6.0.5" />
 	</ItemGroup>
 
 </Project>
