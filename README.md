@@ -13,6 +13,7 @@ Rate Limit uses InMemory cache by default, but if you set up a Redis connection 
 
 |TargetFramework|Support|
 |---|---|
+|**net7.0**|:white_check_mark:|
 |**net6.0**|:white_check_mark:|
 |**net5.0**|:white_check_mark:|
 |**netcoreapp3.1**|:white_check_mark:|
