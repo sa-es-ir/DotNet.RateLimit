@@ -5,8 +5,8 @@
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
-		<Version>1.0.3</Version>
-		<LangVersion>10</LangVersion>
+		<Version>1.0.4</Version>
+		<LangVersion>preview</LangVersion>
 		<Authors>Saeed Esmaeelinejad</Authors>
 		<PackageId>DotNetRateLimiter</PackageId>
 		<PackageTags>aspnetcore;rate-limit;action-filters</PackageTags>
