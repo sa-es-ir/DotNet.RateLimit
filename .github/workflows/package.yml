@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionIncrement:
+        description: 'The new version. For example: 1.1.0'
+        required: true
+        default: ''
+      prerelease:
+        description: 'Is this a pre-release?'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest    
+    outputs: 
+      Version: ${{ steps.gitversion.outputs.SemVer }}
+      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 #fetch-depth is needed for GitVersion
+        
+    #Install and calculate the new version with GitVersion  
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: 5.x
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      id: gitversion # step id used as reference for output values
+    - name: Display GitVersion outputs
+      run: |
+        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
+        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+    
+    #Build/pack the project
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          6.0.x
+          7.0.x 
+          
+    - name: Build and Pack NuGet package
+      run: |
+        dotnet pack src/DotNet.RateLimiter/DotNet.RateLimiter.csproj -p:PackageVersion=${{ github.event.inputs.versionIncrement }} -c Release
+    - name: Upload NuGet package to GitHub
+      uses: actions/upload-artifact@v2
+      with:
+        name: nugetPackage
+        path: src/DotNet.RateLimiter/bin/Release/ 
+        
+  release:
+    runs-on: ubuntu-latest    
+    needs: build
+    if: github.ref == 'refs/heads/main' # only run job if on the main branch   
+    
+    steps:  
+    #Push NuGet package to GitHub packages
+    - name: Download nuget package artifact
+      uses: actions/download-artifact@v1.0.0
+      with:
+        name: nugetPackage
+    - name: Prep packages
+      run: dotnet nuget add source --username sa-es-ir --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/sa-es-ir/index.json"
+    - name: Push package to GitHub packages 
+      if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
+      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+    
+    #Create release
+    - name: Create Release
+      if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ github.event.inputs.versionIncrement }}
+        tag_name: v${{ github.event.inputs.versionIncrement }}
+        name: Release ${{ github.event.inputs.versionIncrement }}
+        artifacts: "nugetPackage/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
