@@ -1,10 +1,17 @@
 name: CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      versionIncrement:
+        description: 'The new version. For example: 1.1.0'
+        required: true
+        default: ''
+      prerelease:
+        description: 'Is this a pre-release?'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
