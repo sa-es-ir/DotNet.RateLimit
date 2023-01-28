@@ -41,7 +41,7 @@ jobs:
           
     - name: Build and Pack NuGet package
       run: |
-        dotnet pack src/DotNet.RateLimiter/DotNet.RateLimiter.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
+        dotnet pack src/DotNet.RateLimiter/DotNet.RateLimiter.csproj -p:PackageVersion=${{ github.event.inputs.versionIncrement }} -c Release
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v2
       with:
