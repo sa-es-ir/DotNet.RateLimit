@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DotNetRateLimiter" Version="1.0.4" />
+		<PackageReference Include="DotNetRateLimiter" Version="1.0.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 	</ItemGroup>
 
