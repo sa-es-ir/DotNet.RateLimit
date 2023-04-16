@@ -72,8 +72,8 @@ public IActionResult Update([FromBody] WeatherForecast weatherForecast)
 ```
 ### Using on Controller
 ```csharp
-//if Scope set to Controller to rate limit work on all actions no matter which actions call
-//the default value is Action means this rate limit check for each action separately
+//if Scope set to Controller then the rate limit works on all actions and no matter which actions call
+//the default value is Action which means the rate limit checks each action separately
 [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
 public class RateLimitOnAllController : ControllerBase
 { .... }
