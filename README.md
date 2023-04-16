@@ -33,7 +33,7 @@ builder.Services.AddRateLimitService(builder.Configuration);
 ## How to use
 You can see the **Demo** project to know how to use in all scenarios and also you can follow this article in [**Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
 ### Simple use
-Use RateLimit without any parameters
+Using RateLimit without any parameters
 ```csharp
 [HttpGet("")]
 [RateLimit(PeriodInSec = 60, Limit = 3)]
@@ -42,7 +42,7 @@ public IEnumerable<WeatherForecast> Get()
     ....
 }
 ```
-### Use with Route parameters
+### Using with Route parameters
 ```csharp
 [HttpGet("by-route/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id")]
@@ -51,7 +51,7 @@ public IEnumerable<WeatherForecast> Get(int id)
    ....
 }
 ```
-### Use with Query parameters
+### Using with Query parameters
 ```csharp
 [HttpGet("by-query/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id", QueryParams = "name,family")]
@@ -61,7 +61,7 @@ public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<st
 }
 ```
 
-### Use with Body parameters
+### Using with Body parameters
 ```csharp
 [HttpPut]
 [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
@@ -70,7 +70,7 @@ public IActionResult Update([FromBody] WeatherForecast weatherForecast)
 	....
 }
 ```
-### Use on Controller
+### Using on Controller
 ```csharp
 //if Scope set to Controller to rate limit work on all actions no matter which actions call
 //the default value is Action means this rate limit check for each action separately
@@ -78,7 +78,7 @@ public IActionResult Update([FromBody] WeatherForecast weatherForecast)
 public class RateLimitOnAllController : ControllerBase
 { .... }
 ```
-### Ignore rate limit in case of use on Controller
+### Ignoring rate limit in case of use on Controller
 ```csharp
 [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
 public class RateLimitOnAllController : ControllerBase
