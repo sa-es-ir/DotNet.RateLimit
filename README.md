@@ -69,6 +69,12 @@ public IActionResult Update([FromBody] WeatherForecast weatherForecast)
 {
 	....
 }
+
+....
+  public class WeatherForecast
+    {
+        public int TemperatureC { get; set; }
+    }
 ```
 ### Using on Controller
 ```csharp
