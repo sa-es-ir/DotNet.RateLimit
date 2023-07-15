@@ -133,6 +133,7 @@ namespace DotNet.RateLimiter.ActionFilters
                         rateLimitKey.Append(routeValue);
                 }
             }
+
             if (!string.IsNullOrWhiteSpace(QueryParams))
             {
                 var parameters = QueryParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -159,20 +160,14 @@ namespace DotNet.RateLimiter.ActionFilters
             }
             if (!string.IsNullOrWhiteSpace(BodyParams))
             {
-                var parameters = BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
                 var obj = JObject.Parse(jsonSerializer);
-                var properties = obj.Descendants().OfType<JProperty>().Where(p => p.Value.Type != JTokenType.Array && p.Value.Type != JTokenType.Object).ToList();
-                foreach (var parameter in parameters)
+
+                if (obj.Root.First().Values().FirstOrDefault(x => x.Type == JTokenType.Property && string.Equals(((JProperty)x).Name, BodyParams, StringComparison.OrdinalIgnoreCase)) is JProperty property)
                 {
-                    foreach (var property in properties)
-                    {
-                        if (property.Name.Trim().ToLower() == parameter.Trim().ToLower())
-                        {
-                            rateLimitKey.Append(property.Value).Append(":");
-                        }
-                    }
+                    rateLimitKey.Append(property.Value).Append(":");
                 }
+
             }
             return rateLimitKey.ToString();
         }
