@@ -163,11 +163,14 @@ namespace DotNet.RateLimiter.ActionFilters
                 var parameters = BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
                 var obj = JObject.Parse(jsonSerializer);
+
+
                 foreach (var parameter in parameters)
                 {
-                    if (obj.Root.First().Values().FirstOrDefault(x =>
-                            x.Type == JTokenType.Property && string.Equals(((JProperty)x).Name, parameter,
-                                StringComparison.OrdinalIgnoreCase)) is JProperty property)
+                    var rootProperty = obj.Root.First().Values().FirstOrDefault(x => x.Type == JTokenType.Property
+                             && string.Equals(((JProperty)x).Name, parameter, StringComparison.OrdinalIgnoreCase));
+
+                    if (rootProperty is JProperty property)
                     {
                         rateLimitKey.Append(property.Value).Append(":");
                     }
