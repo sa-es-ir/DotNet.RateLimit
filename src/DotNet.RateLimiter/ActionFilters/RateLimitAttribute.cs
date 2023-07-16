@@ -160,14 +160,18 @@ namespace DotNet.RateLimiter.ActionFilters
             }
             if (!string.IsNullOrWhiteSpace(BodyParams))
             {
+                var parameters = BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
                 var obj = JObject.Parse(jsonSerializer);
-
-                if (obj.Root.First().Values().FirstOrDefault(x => x.Type == JTokenType.Property && string.Equals(((JProperty)x).Name, BodyParams, StringComparison.OrdinalIgnoreCase)) is JProperty property)
+                foreach (var parameter in parameters)
                 {
-                    rateLimitKey.Append(property.Value).Append(":");
+                    if (obj.Root.First().Values().FirstOrDefault(x =>
+                            x.Type == JTokenType.Property && string.Equals(((JProperty)x).Name, parameter,
+                                StringComparison.OrdinalIgnoreCase)) is JProperty property)
+                    {
+                        rateLimitKey.Append(property.Value).Append(":");
+                    }
                 }
-
             }
             return rateLimitKey.ToString();
         }
