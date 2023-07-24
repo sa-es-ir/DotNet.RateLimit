@@ -63,6 +63,7 @@ public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<st
 
 ### Using with Body parameters
 ```csharp
+// body parameter only works on root parameters and does not work on nested parameters.
 [HttpPut]
 [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
 public IActionResult Update([FromBody] WeatherForecast weatherForecast)
