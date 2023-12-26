@@ -14,6 +14,7 @@ Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** co
 
 |TargetFramework|Support|
 |---|---|
+|**net8.0**|:white_check_mark:|
 |**net7.0**|:white_check_mark:|
 |**net6.0**|:white_check_mark:|
 |**net5.0**|:white_check_mark:|
