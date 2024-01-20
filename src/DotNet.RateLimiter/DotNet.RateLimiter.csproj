@@ -58,13 +58,12 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
 	</ItemGroup>
 
-	<ItemGroup
-		Condition="$(TargetFramework) == 'netcoreapp3.1' Or $(TargetFramework) == 'net5.0' Or $(TargetFramework) == 'net6.0' Or $(TargetFramework) == 'net7.0' Or $(TargetFramework) == 'net8.0'">
+	<ItemGroup Condition="$(TargetFramework) == 'netcoreapp3.1' Or $(TargetFramework) == 'net5.0' Or $(TargetFramework) == 'net6.0' Or $(TargetFramework) == 'net7.0' Or $(TargetFramework) == 'net8.0'">
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AsyncKeyedLock" Version="6.2.6" />
+		<PackageReference Include="AsyncKeyedLock" Version="6.3.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="RedLock.net" Version="2.3.2" />
 		<PackageReference Include="StackExchange.Redis" Version="2.7.10" />
