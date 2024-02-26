@@ -1,10 +1,13 @@
 <p align="center"><img src="rate-limit.webp" width="300"></p>
 
+<div align="center">
+	
 [![Build status](https://ci.appveyor.com/api/projects/status/9i2u298skqni6s3g?svg=true)](https://ci.appveyor.com/project/SaeedEsmaeelinejad/dotnet-ratelimit)
 [![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![NuGet](https://img.shields.io/nuget/dt/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![GitHub stars](https://img.shields.io/github/stars/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/network)
+</div>
+
 # DotNetRateLimiter
 
 This is a RateLimit that works with ActionFilters! An approach designed to control the request rate for a specific Action or Controller. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with action filters, you can limit some of the critical endpoints.
