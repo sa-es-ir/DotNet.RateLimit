@@ -13,6 +13,7 @@ namespace DotNet.RateLimiter.Implementations
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<InMemoryRateLimitService> _logger;
         private readonly AsyncKeyedLocker<string> _lockProvider;
+
         public InMemoryRateLimitService(IMemoryCache memoryCache,
             ILogger<InMemoryRateLimitService> logger,
             AsyncKeyedLocker<string> lockProvider)
