@@ -110,18 +110,16 @@ namespace DotNet.RateLimiter.ActionFilters
 
         private string ProvideRateLimitKey(ActionExecutingContext context, string requestKey)
         {
-            //get controller and action name
             context.ActionDescriptor.RouteValues.TryGetValue("Controller", out var controller);
             context.ActionDescriptor.RouteValues.TryGetValue("Action", out var action);
 
-            //var rateLimitKey = $"{requestKey}:{controller}";
             var rateLimitKey = new StringBuilder();
 
             rateLimitKey.Append(requestKey).Append(":").Append(controller);
+
             //if scope is action then add action name to the key to consider each action separately
             if (Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
-
 
             if (!string.IsNullOrWhiteSpace(RouteParams))
             {
@@ -150,19 +148,18 @@ namespace DotNet.RateLimiter.ActionFilters
                                 rateLimitKey.Append(items[0]).Append(":");
                                 break;
                             default:
-                                // rateLimitKey.AppendJoin(':',items); Not support in dotnet standard 2.0
                                 rateLimitKey.Append(string.Join(":", items));
                                 break;
                         }
                     }
                 }
             }
+
             if (!string.IsNullOrWhiteSpace(BodyParams))
             {
                 var parameters = BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
                 var obj = JObject.Parse(jsonSerializer);
-
 
                 foreach (var parameter in parameters)
                 {
@@ -175,6 +172,7 @@ namespace DotNet.RateLimiter.ActionFilters
                     }
                 }
             }
+
             return rateLimitKey.ToString();
         }
     }
