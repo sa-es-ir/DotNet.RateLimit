@@ -48,7 +48,7 @@ public class TestInitializer
             }
 
 
-        return new ActionContext(httpContext,   
+        return new ActionContext(httpContext,
             new RouteData(),
             new ActionDescriptor()
             {
@@ -73,16 +73,18 @@ public class TestInitializer
         string? queryParams = null, string? bodyParams = null, RateLimitScope scope = RateLimitScope.Action)
     {
         return new RateLimitAttribute(
-            scopeFactory.ServiceProvider.GetRequiredService<ILogger<RateLimitAttribute>>(),
-            scopeFactory.ServiceProvider.GetRequiredService<IRateLimitService>(),
-            scopeFactory.ServiceProvider.GetRequiredService<IOptions<RateLimitOptions>>())
+            scopeFactory.ServiceProvider.GetRequiredService<IOptions<RateLimitOptions>>(),
+            scopeFactory.ServiceProvider.GetRequiredService<IRateLimitCoordinator>())
         {
-            Limit = limit,
-            PeriodInSec = periodInSec,
-            QueryParams = queryParams,
-            RouteParams = routeParams,
-            BodyParams = bodyParams,
-            Scope = scope
+            RateLimitParams = new RateLimitAttributeParams
+            {
+                BodyParams = bodyParams,
+                Limit = limit,
+                PeriodInSec = periodInSec,
+                RouteParams = routeParams,
+                QueryParams = queryParams,
+                Scope = scope
+            }
         };
     }
 

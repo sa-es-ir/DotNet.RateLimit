@@ -46,12 +46,15 @@ namespace DotNet.RateLimiter.ActionFilters
         {
             var filter = serviceProvider.GetRequiredService<RateLimitAttribute>();
             filter.Order = Order;
-            filter.PeriodInSec = PeriodInSec;
-            filter.Limit = Limit;
-            filter.RouteParams = RouteParams;
-            filter.QueryParams = QueryParams;
-            filter.BodyParams = BodyParams;
-            filter.Scope = Scope;
+            filter.RateLimitParams = new Models.RateLimitAttributeParams
+            {
+                Scope = Scope,
+                Limit = Limit,
+                PeriodInSec = PeriodInSec,
+                RouteParams = RouteParams,
+                BodyParams = BodyParams,
+                QueryParams = QueryParams
+            };
 
             return filter;
         }

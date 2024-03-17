@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Interfaces
 {

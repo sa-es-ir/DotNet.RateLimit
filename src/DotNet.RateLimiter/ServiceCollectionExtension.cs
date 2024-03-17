@@ -19,6 +19,7 @@ namespace DotNet.RateLimiter
         {
             services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
             services.AddScoped<RateLimitAttribute>();
+            services.AddScoped<IRateLimitCoordinator, RateLimitCoordinator>();
 
             var options = new RateLimitOptions();
             configuration.GetSection("RateLimitOption").Bind(options);
