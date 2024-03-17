@@ -8,12 +8,6 @@ namespace DotNet.RateLimiter.Extensions
 {
     public static class HttpRequestExtension
     {
-        /// <summary>
-        /// get current user Ip address based on header name
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="headerName"></param>
-        /// <returns></returns>
         public static IPAddress GetUserIp(this HttpRequest request, string headerName)
         {
             if (request.Headers[headerName].FirstOrDefault() != null)
@@ -24,12 +18,6 @@ namespace DotNet.RateLimiter.Extensions
             return request.HttpContext.Connection.RemoteIpAddress;
         }
 
-        /// <summary>
-        /// get ip addresses
-        /// </summary>
-        /// <param name="ips"></param>
-        /// <param name="separator">ips separator(default is ',')</param>
-        /// <returns></returns>
         public static List<IPAddress> GetIpAddresses(this string ips, string separator = ",")
         {
             var ipAddresses = new List<IPAddress>();

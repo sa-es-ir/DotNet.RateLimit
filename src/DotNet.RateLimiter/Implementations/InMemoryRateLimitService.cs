@@ -50,7 +50,7 @@ namespace DotNet.RateLimiter.Implementations
                         //rate limit exceeded
                         if (cacheEntry.Total >= limit)
                         {
-                            _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{cacheEntry.Total}");
+                            _logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {cacheEntry.Total}");
 
                             return false;
                         }

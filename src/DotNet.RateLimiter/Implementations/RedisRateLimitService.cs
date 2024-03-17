@@ -44,7 +44,7 @@ namespace DotNet.RateLimiter.Implementations
 
                 if (counts >= limit)
                 {
-                    _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{counts}");
+                    _logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {counts}");
 
                     return false;
                 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace DotNet.RateLimiter.ActionFilters
 {
     /// <summary>
-    /// using for ignore rate limit
+    /// Use for ignoring rate limit
     /// </summary>
     public class IgnoreRateLimitAttribute : Attribute, IIgnoreRateLimitFilter { }
 
