@@ -1,4 +1,6 @@
 using DotNet.RateLimiter;
+using DotNet.RateLimiter.Demo;
+using DotNet.RateLimiter.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,5 +24,16 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/weatherforecast", () =>
+{
+    return Results.Ok("Hi I'm here!");
+})
+.WithName("GetWeatherForecast")
+.WithRateLimiter(options =>
+{
+    options.PeriodInSec = 60;
+    options.Limit = 2;
+});
 
 app.Run();

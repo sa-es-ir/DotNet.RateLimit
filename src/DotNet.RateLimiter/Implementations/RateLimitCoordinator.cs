@@ -12,6 +12,7 @@ using System.Text;
 using System;
 using System.Linq;
 using DotNet.RateLimiter.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace DotNet.RateLimiter.Implementations;
 
@@ -40,6 +41,9 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             {
                 return true;
             }
+
+            if (ratelimitParams.Limit <= 0)
+                return false;
 
             //get current user IP based on header name
             var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName)?.ToString();
@@ -82,6 +86,11 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             _logger.LogCritical(e, e.Message);
             return true;
         }
+    }
+
+    public Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams)
+    {
+        return Task.FromResult(true);
     }
 
     private string ProvideRateLimitKey(ActionExecutingContext context, RateLimitAttributeParams ratelimitParams, string requestKey)
