@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.EndPointFilters;
 
+#if NET7_0_OR_GREATER
 public class RateLimitEndPointFilter : IEndpointFilter
 {
     private readonly IOptions<RateLimitOptions> _options;
@@ -42,3 +43,5 @@ public class RateLimitEndPointFilter : IEndpointFilter
         }
     }
 }
+
+#endif

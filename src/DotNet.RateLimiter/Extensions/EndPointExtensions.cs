@@ -9,6 +9,7 @@ namespace DotNet.RateLimiter.Extensions
 {
     public static class EndPointExtensions
     {
+#if NET7_0_OR_GREATER
         public static TBuilder WithRateLimiter<TBuilder>(this TBuilder builder, Action<RateLimitEndPointParams> options)
             where TBuilder : IEndpointConventionBuilder
         {
@@ -40,5 +41,7 @@ namespace DotNet.RateLimiter.Extensions
 
             return builder;
         }
+#endif
+
     }
 }

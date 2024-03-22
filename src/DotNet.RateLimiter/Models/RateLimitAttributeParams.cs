@@ -35,9 +35,4 @@ public class RateLimitEndPointParams
     /// seek in query string parameters and check rate limit for specific params, for multiple parameters separate them by comma (,)
     /// </summary>
     public string QueryParams { get; set; }
-
-    /// <summary>
-    /// seek in body parameters and check rate limit for specific params, for multiple parameters separate them by comma (,)
-    /// </summary>
-    public string BodyParams { get; set; }
 }

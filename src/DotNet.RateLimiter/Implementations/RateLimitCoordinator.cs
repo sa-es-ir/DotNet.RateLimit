@@ -88,11 +88,12 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         }
     }
 
+#if NET7_0_OR_GREATER
     public Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams)
     {
         return Task.FromResult(true);
     }
-
+#endif
     private string ProvideRateLimitKey(ActionExecutingContext context, RateLimitAttributeParams ratelimitParams, string requestKey)
     {
         context.ActionDescriptor.RouteValues.TryGetValue("Controller", out var controller);
