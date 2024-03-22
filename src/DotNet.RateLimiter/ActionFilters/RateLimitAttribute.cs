@@ -29,7 +29,7 @@ namespace DotNet.RateLimiter.ActionFilters
 
         public int Order { get; set; }
 
-        public RateLimitAttributeParams RateLimitParams { get; set; }
+        public RateLimitParams RateLimitParams { get; set; }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {

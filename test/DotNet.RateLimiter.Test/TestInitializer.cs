@@ -76,7 +76,7 @@ public class TestInitializer
             scopeFactory.ServiceProvider.GetRequiredService<IOptions<RateLimitOptions>>(),
             scopeFactory.ServiceProvider.GetRequiredService<IRateLimitCoordinator>())
         {
-            RateLimitParams = new RateLimitAttributeParams
+            RateLimitParams = new RateLimitParams
             {
                 BodyParams = bodyParams,
                 Limit = limit,

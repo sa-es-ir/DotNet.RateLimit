@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using DotNet.RateLimiter.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotNet.RateLimiter.Implementations;
 
@@ -32,41 +33,14 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     }
 
 
-    public async Task<bool> CheckRateLimitAsync(ActionExecutingContext context, RateLimitAttributeParams ratelimitParams)
+    public async Task<bool> CheckRateLimitAsync(ActionExecutingContext context, RateLimitParams ratelimitParams)
     {
         try
         {
-            //bypass request if rate limit was disable
-            if (!_options.Value.EnableRateLimit)
-            {
-                return true;
-            }
+            (bool ShortCircuit, bool HasAccess, string RateLimitPrefixKey) = InitialChecking(context.HttpContext, ratelimitParams);
 
-            if (ratelimitParams.Limit <= 0)
-                return false;
-
-            //get current user IP based on header name
-            var userIp = context.HttpContext.Request.GetUserIp(_options.Value.IpHeaderName)?.ToString();
-
-            //skip rate limit if IP is in white list
-            if (_options.Value.IpWhiteList.Contains(userIp))
-            {
-                return true;
-            }
-
-            var requestKey = userIp;
-
-            if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) &&
-                context.HttpContext.Request.Headers.TryGetValue(_options.Value.ClientIdentifier, out var clientId))
-            {
-                //skip rate limit for client identifiers in white list
-                if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
-                {
-                    return true;
-                }
-
-                requestKey = clientId.ToString();
-            }
+            if (ShortCircuit)
+                return HasAccess;
 
             //if action had ignored rate limit then skip it
             var filters = context.Filters;
@@ -75,11 +49,25 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 return true;
             }
 
-            var rateLimitKey = ProvideRateLimitKey(context, ratelimitParams, requestKey);
+            context.ActionDescriptor.RouteValues.TryGetValue("Controller", out var controller);
+            context.ActionDescriptor.RouteValues.TryGetValue("Action", out var action);
 
-            return await _rateLimitService.HasAccessAsync(rateLimitKey, ratelimitParams.PeriodInSec, ratelimitParams.Limit);
+            var rateLimitKey = new StringBuilder();
 
+            rateLimitKey
+                .Append(RateLimitPrefixKey)
+                .Append(context.HttpContext.Request.Method)
+                .Append(controller);
 
+            //if scope is action then add action name to the key to consider each action separately
+            if (ratelimitParams.Scope == RateLimitScope.Action)
+                rateLimitKey.Append(action);
+
+            ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
+
+            SetBodyParamsRateLimitKey(context, ratelimitParams, rateLimitKey);
+
+            return await _rateLimitService.HasAccessAsync(rateLimitKey.ToString(), ratelimitParams.PeriodInSec, ratelimitParams.Limit);
         }
         catch (Exception e)
         {
@@ -88,31 +76,87 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         }
     }
 
-#if NET7_0_OR_GREATER
-    public Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams)
+    private (bool ShortCircuit, bool HasAccess, string RateLimitPrefixKey) InitialChecking(HttpContext httpContext, RateLimitParams ratelimitParams)
     {
-        return Task.FromResult(true);
+        //bypass request if rate limit was disable
+        if (!_options.Value.EnableRateLimit)
+        {
+            return (true, true, default);
+        }
+
+        if (ratelimitParams.Limit <= 0)
+            return (true, false, default);
+
+        //get current user IP based on header name
+        var userIp = httpContext.Request.GetUserIp(_options.Value.IpHeaderName)?.ToString();
+
+        //skip rate limit if IP is in white list
+        if (_options.Value.IpWhiteList.Contains(userIp))
+        {
+            return (true, true, default);
+        }
+
+        var rateLimitPrefixKey = userIp;
+
+        if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) &&
+            httpContext.Request.Headers.TryGetValue(_options.Value.ClientIdentifier, out var clientId))
+        {
+            //skip rate limit for client identifiers in white list
+            if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
+            {
+                return (true, true, default);
+            }
+
+            rateLimitPrefixKey = clientId.ToString();
+        }
+
+        return (false, true, rateLimitPrefixKey);
+    }
+
+#if NET7_0_OR_GREATER
+    public async Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams)
+    {
+        try
+        {
+            var rateLimitParams = new RateLimitParams
+            {
+                Limit = ratelimitParams.Limit,
+                PeriodInSec = ratelimitParams.PeriodInSec,
+                QueryParams = ratelimitParams.QueryParams,
+                RouteParams = ratelimitParams.RouteParams
+            };
+
+            (bool ShortCircuit, bool HasAccess, string RateLimitPrefixKey) = InitialChecking(context.HttpContext, rateLimitParams);
+
+            if (ShortCircuit)
+                return HasAccess;
+
+            var rateLimitKey = new StringBuilder();
+            rateLimitKey
+                .Append(RateLimitPrefixKey)
+                .Append(context.HttpContext.Request.Method)
+                .Append(context.HttpContext.GetEndpoint().DisplayName);
+
+            ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
+
+            return await _rateLimitService.HasAccessAsync(rateLimitKey.ToString(), ratelimitParams.PeriodInSec, ratelimitParams.Limit);
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical(e, e.Message);
+            return true;
+        }
     }
 #endif
-    private string ProvideRateLimitKey(ActionExecutingContext context, RateLimitAttributeParams ratelimitParams, string requestKey)
+
+    private void ProvideRateLimitKey(HttpContext httpContext, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
     {
-        context.ActionDescriptor.RouteValues.TryGetValue("Controller", out var controller);
-        context.ActionDescriptor.RouteValues.TryGetValue("Action", out var action);
-
-        var rateLimitKey = new StringBuilder();
-
-        rateLimitKey.Append(requestKey).Append(":").Append(controller);
-
-        //if scope is action then add action name to the key to consider each action separately
-        if (ratelimitParams.Scope == RateLimitScope.Action)
-            rateLimitKey.Append(action);
-
         if (!string.IsNullOrWhiteSpace(ratelimitParams.RouteParams))
         {
             var parameters = ratelimitParams.RouteParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
-                if (context.HttpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
+                if (httpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
                     rateLimitKey.Append(routeValue);
             }
         }
@@ -122,9 +166,9 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             var parameters = ratelimitParams.QueryParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
-                if (context.HttpContext.Request.Query.TryGetValue(parameter, out _))
+                if (httpContext.Request.Query.TryGetValue(parameter, out var queryParams))
                 {
-                    var items = context.HttpContext.Request.Query[parameter].ToArray();
+                    var items = queryParams.ToArray();
 
                     switch (items.Length)
                     {
@@ -140,7 +184,10 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 }
             }
         }
+    }
 
+    private static void SetBodyParamsRateLimitKey(ActionExecutingContext context, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
+    {
         if (!string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
         {
             var parameters = ratelimitParams.BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -158,7 +205,5 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 }
             }
         }
-
-        return rateLimitKey.ToString();
     }
 }

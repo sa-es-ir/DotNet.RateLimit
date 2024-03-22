@@ -46,7 +46,7 @@ namespace DotNet.RateLimiter.ActionFilters
         {
             var filter = serviceProvider.GetRequiredService<RateLimitAttribute>();
             filter.Order = Order;
-            filter.RateLimitParams = new Models.RateLimitAttributeParams
+            filter.RateLimitParams = new Models.RateLimitParams
             {
                 Scope = Scope,
                 Limit = Limit,

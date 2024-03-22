@@ -30,11 +30,24 @@ app.MapGet("/weatherforecast/{id}/{name}", (int id, string name, [FromQuery] str
 {
     return Results.Ok($"Hi I'm here! {id} - {name} - {search} - {age}");
 })
-.WithName("GetWeatherForecast")
 .WithRateLimiter(options =>
 {
     options.PeriodInSec = 60;
     options.Limit = 2;
+    options.QueryParams = "search,age";
+    options.RouteParams = "id,name";
+});
+
+app.MapGet("/weatherforecast/{id}/{name}/another", (int id, string name, [FromQuery] string search, [FromQuery] int? age) =>
+{
+    return Results.Ok($"Hi I'm here! {id} - {name} - {search} - {age}");
+})
+.WithRateLimiter(options =>
+{
+    options.PeriodInSec = 60;
+    options.Limit = 2;
+    options.QueryParams = "search,age";
+    options.RouteParams = "id,name";
 });
 
 app.Run();

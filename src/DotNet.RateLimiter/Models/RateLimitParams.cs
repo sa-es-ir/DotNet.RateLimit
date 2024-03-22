@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DotNet.RateLimiter.Models;
 
-public class RateLimitAttributeParams
+public class RateLimitParams
 {
     public int PeriodInSec { get; set; }
     public int Limit { get; set; }
