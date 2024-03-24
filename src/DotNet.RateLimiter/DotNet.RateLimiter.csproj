@@ -1,22 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;netstandard2.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
-		<!--<TargetFrameworks>net8.0</TargetFrameworks>-->
 		<AssemblyName>DotNet.RateLimiter</AssemblyName>
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
-		<Version>1.0.8</Version>
+		<Version>2.0.0</Version>
 		<LangVersion>preview</LangVersion>
 		<Authors>Saeed Esmaeelinejad</Authors>
 		<PackageId>DotNetRateLimiter</PackageId>
-		<PackageTags>aspnetcore;rate-limit;action-filters</PackageTags>
+		<PackageTags>aspnetcore;rate-limit;action-filters,minimal-api</PackageTags>
 		<PackageLicense>http://opensource.org/licenses/MIT</PackageLicense>
 		<PackageProjectUrl>https://github.com/sa-es-ir/DotNet.RateLimit</PackageProjectUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/sa-es-ir/DotNet.RateLimit</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<Description>DotNet Rate Limit by using ActionFilters for control requeste rate on Action or Controller, it supports in-memory and redis</Description>
+		<Description>DotNet Rate Limit for control request rate on Action or Controller and MinimalApi, it supports in-memory and redis</Description>
 	</PropertyGroup>
 
 	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
