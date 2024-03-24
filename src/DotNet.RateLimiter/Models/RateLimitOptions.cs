@@ -8,6 +8,7 @@ namespace DotNet.RateLimiter.Models
         {
             IpWhiteList = new List<string>();
         }
+
         /// <summary>
         /// if false will bypass all requests, default is true.
         /// </summary>

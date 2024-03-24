@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DotNet.RateLimiter.Test;
@@ -34,6 +33,27 @@ public class TestInitializer
         Dictionary<string, object?>? queryParams = null,
         Dictionary<string, object>? bodyParams = null)
     {
+        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams);
+
+        var actionContext = new ActionContext(httpContext,
+            new RouteData(),
+            new ActionDescriptor()
+            {
+                RouteValues = new Dictionary<string, string?>()
+                {
+                    { "Controller", controllerName },
+                    { "Action", actionName }
+                }
+            },
+            new ModelStateDictionary());
+
+        return actionContext;
+    }
+
+    private static DefaultHttpContext CreateHttpContext(string ipHeaderName, string ip,
+        Dictionary<string, object?>? routeParams,
+        Dictionary<string, object?>? queryParams)
+    {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.TryAdd(ipHeaderName, ip);
 
@@ -47,20 +67,7 @@ public class TestInitializer
                 httpContext.Request.QueryString = httpContext.Request.QueryString.Add(queryParam.Key, queryParam.Value?.ToString() ?? "test");
             }
 
-
-        return new ActionContext(httpContext,   
-            new RouteData(),
-            new ActionDescriptor()
-            {
-                RouteValues = new Dictionary<string, string?>()
-                {
-                    { "Controller", controllerName },
-                    { "Action", actionName }
-                }
-            },
-            new ModelStateDictionary());
-
-
+        return httpContext;
     }
 
     public static Task<ActionExecutedContext> ActionExecutionDelegateNext(ActionContext actionContext)
@@ -73,22 +80,35 @@ public class TestInitializer
         string? queryParams = null, string? bodyParams = null, RateLimitScope scope = RateLimitScope.Action)
     {
         return new RateLimitAttribute(
-            scopeFactory.ServiceProvider.GetRequiredService<ILogger<RateLimitAttribute>>(),
-            scopeFactory.ServiceProvider.GetRequiredService<IRateLimitService>(),
-            scopeFactory.ServiceProvider.GetRequiredService<IOptions<RateLimitOptions>>())
+            scopeFactory.ServiceProvider.GetRequiredService<IOptions<RateLimitOptions>>(),
+            scopeFactory.ServiceProvider.GetRequiredService<IRateLimitCoordinator>())
         {
-            Limit = limit,
-            PeriodInSec = periodInSec,
-            QueryParams = queryParams,
-            RouteParams = routeParams,
-            BodyParams = bodyParams,
-            Scope = scope
+            RateLimitParams = new RateLimitParams
+            {
+                BodyParams = bodyParams,
+                Limit = limit,
+                PeriodInSec = periodInSec,
+                RouteParams = routeParams,
+                QueryParams = queryParams,
+                Scope = scope
+            }
         };
     }
-
 
     public static string GetRandomIpAddress()
     {
         return $"{Random.Next(1, 255)}.{Random.Next(0, 255)}.{Random.Next(0, 255)}.{Random.Next(0, 255)}";
+    }
+
+    internal static EndpointFilterInvocationContext CreateEndPointContext(string ipHeaderName = "X-Forwarded-For",
+        string ip = "127.0.0.1",
+        Dictionary<string, object?>? routeParams = null,
+        Dictionary<string, object?>? queryParams = null)
+    {
+        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams);
+
+        httpContext.SetEndpoint(new Endpoint(null, null, displayName: Guid.NewGuid().ToString()));
+
+        return EndpointFilterInvocationContext.Create(httpContext);
     }
 }

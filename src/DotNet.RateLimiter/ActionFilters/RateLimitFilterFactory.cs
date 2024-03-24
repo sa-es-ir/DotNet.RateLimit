@@ -13,12 +13,12 @@ namespace DotNet.RateLimiter.ActionFilters
         public int Order { get; set; }
 
         /// <summary>
-        /// period of time in seconds for rate limit
+        /// Required - period of time in seconds for rate limit
         /// </summary>
         public int PeriodInSec { get; set; }
 
         /// <summary>
-        /// limit of requests
+        /// Required - Number of requests in the period to be allowed
         /// </summary>
         public int Limit { get; set; }
 
@@ -46,12 +46,15 @@ namespace DotNet.RateLimiter.ActionFilters
         {
             var filter = serviceProvider.GetRequiredService<RateLimitAttribute>();
             filter.Order = Order;
-            filter.PeriodInSec = PeriodInSec;
-            filter.Limit = Limit;
-            filter.RouteParams = RouteParams;
-            filter.QueryParams = QueryParams;
-            filter.BodyParams = BodyParams;
-            filter.Scope = Scope;
+            filter.RateLimitParams = new Models.RateLimitParams
+            {
+                Scope = Scope,
+                Limit = Limit,
+                PeriodInSec = PeriodInSec,
+                RouteParams = RouteParams,
+                BodyParams = BodyParams,
+                QueryParams = QueryParams
+            };
 
             return filter;
         }

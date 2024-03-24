@@ -22,7 +22,7 @@ namespace DotNet.RateLimiter.Demo.Controllers
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
+                Temperature = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
                 .ToArray();
@@ -40,7 +40,7 @@ namespace DotNet.RateLimiter.Demo.Controllers
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
+                Temperature = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
                 .ToArray();
@@ -60,7 +60,7 @@ namespace DotNet.RateLimiter.Demo.Controllers
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
+                Temperature = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
@@ -72,7 +72,7 @@ namespace DotNet.RateLimiter.Demo.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC")]
+        [RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperature")]
         public IActionResult Update([FromBody] WeatherForecast weatherForecast)
         {
             return Ok();

@@ -1,14 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Interfaces
 {
-    /// <summary>
-    /// rate limit service
-    /// </summary>
     public interface IRateLimitService
     {
         /// <summary>
-        /// consider request can proceed or not based on key
+        /// consider request can proceed or not based on the given key
         /// </summary>
         /// <param name="resourceKey"></param>
         /// <param name="periodInSec"></param>

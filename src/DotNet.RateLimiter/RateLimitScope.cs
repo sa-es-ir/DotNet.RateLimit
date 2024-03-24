@@ -3,12 +3,12 @@
     public enum RateLimitScope
     {
         /// <summary>
-        /// rate limit will work for each action
+        /// Rate limit will work on each action
         /// </summary>
         Action,
 
         /// <summary>
-        /// rate limit will work for entire controller no matter which action calls
+        /// Rate limit will work on the entire controller no matter which action calls
         /// </summary>
         Controller
     }

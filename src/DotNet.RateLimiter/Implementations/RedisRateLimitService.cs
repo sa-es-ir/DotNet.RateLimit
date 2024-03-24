@@ -30,10 +30,6 @@ namespace DotNet.RateLimiter.Implementations
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            //if limit set to 0 or less than zero so no need to check limit and block the request
-            if (limit <= 0)
-                return false;
-
             await using var distributedLock = await _lockFactory.CreateLockAsync(resourceKey, _lockExpiry, _lockWait, _lockRetry);
 
             if (distributedLock.IsAcquired)
@@ -44,7 +40,7 @@ namespace DotNet.RateLimiter.Implementations
 
                 if (counts >= limit)
                 {
-                    _logger.LogCritical($"Rate limit : key :{resourceKey} - count:{counts}");
+                    _logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {counts}");
 
                     return false;
                 }

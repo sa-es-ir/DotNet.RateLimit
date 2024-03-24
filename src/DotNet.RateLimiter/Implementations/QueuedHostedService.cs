@@ -39,16 +39,9 @@ namespace DotNet.RateLimiter.Implementations
                 catch (Exception ex)
                 {
                     _logger.LogError(ex,
-                        "Error occurred executing {WorkItem}.", nameof(workItem));
+                        "DotNet.RateLimiter:: Error occurred executing {WorkItem}.", nameof(workItem));
                 }
             }
-        }
-
-        public override async Task StopAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("Queued Hosted Service is stopping.");
-
-            await base.StopAsync(stoppingToken);
         }
     }
 }
