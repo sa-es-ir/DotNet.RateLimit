@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Interfaces;
@@ -15,9 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace DotNet.RateLimiter.Test;
 
@@ -38,7 +33,7 @@ public class TestInitializer
         Dictionary<string, object?>? queryParams = null,
         Dictionary<string, object>? bodyParams = null)
     {
-        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams, bodyParams);
+        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams);
 
         var actionContext = new ActionContext(httpContext,
             new RouteData(),
@@ -57,8 +52,7 @@ public class TestInitializer
 
     private static DefaultHttpContext CreateHttpContext(string ipHeaderName, string ip,
         Dictionary<string, object?>? routeParams,
-        Dictionary<string, object?>? queryParams,
-        Dictionary<string, object>? bodyParams = null)
+        Dictionary<string, object?>? queryParams)
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.TryAdd(ipHeaderName, ip);
@@ -72,14 +66,6 @@ public class TestInitializer
             {
                 httpContext.Request.QueryString = httpContext.Request.QueryString.Add(queryParam.Key, queryParam.Value?.ToString() ?? "test");
             }
-
-        //if (bodyParams != null && bodyParams.Any())
-        //{
-        //    var body = new {Root = bodyParams};
-        //    var bodyBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(body));
-
-        //    httpContext.Request.Body = new MemoryStream(bodyBytes);
-        //}
 
         return httpContext;
     }
@@ -112,5 +98,17 @@ public class TestInitializer
     public static string GetRandomIpAddress()
     {
         return $"{Random.Next(1, 255)}.{Random.Next(0, 255)}.{Random.Next(0, 255)}.{Random.Next(0, 255)}";
+    }
+
+    internal static EndpointFilterInvocationContext CreateEndPointContext(string ipHeaderName = "X-Forwarded-For",
+        string ip = "127.0.0.1",
+        Dictionary<string, object?>? routeParams = null,
+        Dictionary<string, object?>? queryParams = null)
+    {
+        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams);
+
+        httpContext.SetEndpoint(new Endpoint(null, null, displayName: Guid.NewGuid().ToString()));
+
+        return EndpointFilterInvocationContext.Create(httpContext);
     }
 }

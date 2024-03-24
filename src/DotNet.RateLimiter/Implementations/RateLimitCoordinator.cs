@@ -135,7 +135,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             rateLimitKey
                 .Append(RateLimitPrefixKey)
                 .Append(context.HttpContext.Request.Method)
-                .Append(context.HttpContext.GetEndpoint().DisplayName);
+                .Append(context.HttpContext.GetEndpoint()?.DisplayName);
 
             ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
 

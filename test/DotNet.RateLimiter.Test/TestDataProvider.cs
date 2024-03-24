@@ -12,6 +12,18 @@ public class TestDataProvider
             new object[] { 1, 60, new Dictionary<string, object?>(), HttpStatusCode.OK }
         };
 
+    public static IEnumerable<object[]> TrueTestDataWithNoParams =>
+       new List<object[]>
+       {
+            new object[] { 1, 60, true }
+       };
+
+    public static IEnumerable<object[]> FalseTestDataWithNoParams =>
+      new List<object[]>
+      {
+            new object[] { 1, 60, false }
+      };
+
     public static IEnumerable<object[]> TooManyRequestTestDataWithNoParams =>
         new List<object[]>
         {
@@ -26,6 +38,26 @@ public class TestDataProvider
                 {"id","20"},
                 {"name","rate-limit"},
             }, HttpStatusCode.OK }
+        };
+
+    public static IEnumerable<object[]> TrueTestDataWithRouteParams =>
+        new List<object[]>
+        {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+            {
+                {"id","20"},
+                {"name","rate-limit"},
+            }, true }
+        };
+
+    public static IEnumerable<object[]> FalseTestDataWithRouteParams =>
+        new List<object[]>
+        {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+            {
+                {"id","20"},
+                {"name","rate-limit"},
+            }, false }
         };
 
     public static IEnumerable<object[]> TooManyRequestTestDataWithRouteParams =>
@@ -53,6 +85,38 @@ public class TestDataProvider
                 }
                 , HttpStatusCode.OK }
         };
+
+    public static IEnumerable<object[]> TrueTestDataWithRouteAndQueryParams =>
+       new List<object[]>
+       {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+                {
+                    {"id","20"},
+                    {"name","rate-limit"}
+                },
+                new Dictionary<string, object>()
+                {
+                    {"q1","query1"},
+                    {"q2","query2"}
+                }
+                , true }
+       };
+
+    public static IEnumerable<object[]> FalseTestDataWithRouteAndQueryParams =>
+       new List<object[]>
+       {
+            new object[] { 1, 60, new Dictionary<string, object?>()
+                {
+                    {"id","20"},
+                    {"name","rate-limit"}
+                },
+                new Dictionary<string, object>()
+                {
+                    {"q1","query1"},
+                    {"q2","query2"}
+                }
+                , false }
+       };
 
     public static IEnumerable<object[]> TooManyRequestTestDataWithRouteAndQueryParams =>
         new List<object[]>
