@@ -35,7 +35,19 @@ public IEnumerable<WeatherForecast> Get()
     ....
 }
 ```
-### Using with Route parameters
+For MinimalAPI **.NET 7+**
+```csharp
+app.MapGet("/weatherforecast", () =>
+{
+    return Results.Ok();
+})
+.WithRateLimiter(options =>
+{
+    options.PeriodInSec = 60;
+    options.Limit = 3;
+});
+```
+### Using Route parameters
 ```csharp
 [HttpGet("by-route/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id")]
@@ -44,7 +56,20 @@ public IEnumerable<WeatherForecast> Get(int id)
    ....
 }
 ```
-### Using with Query parameters
+For MinimalAPI **.NET 7+**
+```csharp
+app.MapGet("/weatherforecast/{id}", (int id) =>
+{
+    return Results.Ok();
+})
+.WithRateLimiter(options =>
+{
+    options.PeriodInSec = 60;
+    options.Limit = 3;
+    options.RouteParams = "id";
+});
+```
+### Using Query parameters
 ```csharp
 [HttpGet("by-query/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id", QueryParams = "name,family")]
@@ -53,8 +78,21 @@ public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<st
     ....
 }
 ```
-
-### Using with Body parameters
+For MinimalAPI **.NET 7+**
+```csharp
+app.MapGet("/weatherforecast/{id}", (int id, string name, string family) =>
+{
+    return Results.Ok();
+})
+.WithRateLimiter(options =>
+{
+    options.PeriodInSec = 60;
+    options.Limit = 2;
+    options.QueryParams = "name,family";
+    options.RouteParams = "id";
+});
+```
+### Using with Body parameters (Only for ActionFilters)
 ```csharp
 // body parameter only works on root parameters and does not work on nested parameters.
 [HttpPut]
