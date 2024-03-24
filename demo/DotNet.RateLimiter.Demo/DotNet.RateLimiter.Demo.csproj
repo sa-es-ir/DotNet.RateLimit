@@ -9,12 +9,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="DotNetRateLimiter" Version="1.0.8" />-->
+		<PackageReference Include="DotNetRateLimiter" Version="2.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<ProjectReference Include="..\..\src\DotNet.RateLimiter\DotNet.RateLimiter.csproj" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 </Project>
