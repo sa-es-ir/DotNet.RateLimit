@@ -17,12 +17,12 @@ public class RateLimitParams
 public class RateLimitEndPointParams
 {
     /// <summary>
-    /// period of time in seconds for rate limit
+    /// Required - period of time in seconds for rate limit
     /// </summary>
     public int PeriodInSec { get; set; }
 
     /// <summary>
-    /// limit of requests
+    /// Required - Number of requests in the period to be allowed
     /// </summary>
     public int Limit { get; set; }
 

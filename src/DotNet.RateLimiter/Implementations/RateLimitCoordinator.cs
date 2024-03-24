@@ -84,8 +84,8 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             return (true, true, default);
         }
 
-        if (ratelimitParams.Limit <= 0)
-            return (true, false, default);
+        if (ratelimitParams.Limit <= 0 || ratelimitParams.PeriodInSec <= 0)
+            throw new ArgumentOutOfRangeException("PeriodInSec and Limit must be greater than 0 for RateLimiter");
 
         //get current user IP based on header name
         var userIp = httpContext.Request.GetUserIp(_options.Value.IpHeaderName)?.ToString();

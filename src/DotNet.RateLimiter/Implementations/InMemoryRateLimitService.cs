@@ -27,10 +27,6 @@ namespace DotNet.RateLimiter.Implementations
         {
             using (await _lockProvider.LockAsync(resourceKey).ConfigureAwait(false))
             {
-                //if limit set to 0 or less than zero so no need to check limit and block the request
-                if (limit <= 0)
-                    return false;
-
                 var cacheEntry = new InMemoryRateLimitEntry()
                 {
                     Expiration = DateTime.UtcNow,
