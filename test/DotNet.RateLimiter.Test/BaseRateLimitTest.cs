@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -167,12 +168,15 @@ public class BaseRateLimitTest
 
     [Theory]
     [MemberData(nameof(TestDataProvider.TooManyRequestTestDataWithBodyParams), MemberType = typeof(TestDataProvider))]
-    public async Task ExtraRequest_WithBodyParam_Returns_TooManyRequest(int limit, int periodInSec, Dictionary<string, object?> actionArguments, HttpStatusCode expectedResult)
+    public async Task ExtraRequest_WithBodyParam_Returns_TooManyRequest(int limit, int periodInSec,
+        Dictionary<string, object?> actionArguments, HttpStatusCode expectedResult)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams: string.Join(",", actionArguments.Select(x => x.Key)));
 
-        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments);
+        using var scope = _scopeFactory.CreateScope();
+        var bodyParams = "id,name";
+        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams);
+
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments!);
 
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
 
@@ -183,16 +187,15 @@ public class BaseRateLimitTest
         actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
     }
 
-
-
     [Theory]
     [MemberData(nameof(TestDataProvider.OkTestDataWithBodyParams), MemberType = typeof(TestDataProvider))]
     public async Task NormalRequest_WithBodyParam_Returns_OK(int limit, int periodInSec, Dictionary<string, object?> actionArguments, HttpStatusCode expectedResult)
     {
         using var scope = _scopeFactory.CreateScope();
-        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams: string.Join(",", actionArguments.Select(x => x.Key)));
+        var bodyParams = "id,name";
+        var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, bodyParams);
 
-        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments);
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), bodyParams: actionArguments!);
 
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
 

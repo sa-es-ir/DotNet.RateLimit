@@ -75,8 +75,7 @@ public class TestDataProvider
         {
             new object[] { 1, 60, new Dictionary<string, object?>()
             {
-                {"id","20"},
-                {"name","rate-limit"},
+                {"Model", new {Id = 20, Name = "rate-limit"} }
             }, HttpStatusCode.OK }
         };
 
@@ -86,8 +85,7 @@ public class TestDataProvider
         {
             new object[] { 1, 60, new Dictionary<string, object?>()
             {
-                {"id","20"},
-                {"name","rate-limit"}
+                {"Model", new {Id = 20, Name = "rate-limit"} }
             }, HttpStatusCode.TooManyRequests }
         };
 }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Interfaces;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace DotNet.RateLimiter.Test;
 
@@ -34,6 +38,28 @@ public class TestInitializer
         Dictionary<string, object?>? queryParams = null,
         Dictionary<string, object>? bodyParams = null)
     {
+        var httpContext = CreateHttpContext(ipHeaderName, ip, routeParams, queryParams, bodyParams);
+
+        var actionContext = new ActionContext(httpContext,
+            new RouteData(),
+            new ActionDescriptor()
+            {
+                RouteValues = new Dictionary<string, string?>()
+                {
+                    { "Controller", controllerName },
+                    { "Action", actionName }
+                }
+            },
+            new ModelStateDictionary());
+
+        return actionContext;
+    }
+
+    private static DefaultHttpContext CreateHttpContext(string ipHeaderName, string ip,
+        Dictionary<string, object?>? routeParams,
+        Dictionary<string, object?>? queryParams,
+        Dictionary<string, object>? bodyParams = null)
+    {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.TryAdd(ipHeaderName, ip);
 
@@ -47,20 +73,15 @@ public class TestInitializer
                 httpContext.Request.QueryString = httpContext.Request.QueryString.Add(queryParam.Key, queryParam.Value?.ToString() ?? "test");
             }
 
+        //if (bodyParams != null && bodyParams.Any())
+        //{
+        //    var body = new {Root = bodyParams};
+        //    var bodyBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(body));
 
-        return new ActionContext(httpContext,
-            new RouteData(),
-            new ActionDescriptor()
-            {
-                RouteValues = new Dictionary<string, string?>()
-                {
-                    { "Controller", controllerName },
-                    { "Action", actionName }
-                }
-            },
-            new ModelStateDictionary());
+        //    httpContext.Request.Body = new MemoryStream(bodyBytes);
+        //}
 
-
+        return httpContext;
     }
 
     public static Task<ActionExecutedContext> ActionExecutionDelegateNext(ActionContext actionContext)
@@ -87,7 +108,6 @@ public class TestInitializer
             }
         };
     }
-
 
     public static string GetRandomIpAddress()
     {
