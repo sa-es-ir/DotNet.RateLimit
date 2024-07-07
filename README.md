@@ -10,7 +10,7 @@
 
 # DotNetRateLimiter
 
-This is a RateLimit that works with ActionFilters and EndPointFilters! An approach designed to control the request rate for a specific Action or Controller. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with filters, you can limit some of the critical endpoints.
+This is a RateLimit that works with ActionFilters and EndPointFilters! An approach designed to control the request rate for a specific Action, Controller, or minimal endpoint. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with filters, you can limit some of the critical endpoints.
 
 Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection it will use Redis, it is recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP address but you can set ClientId in request headers and the header name is configurable.
 
