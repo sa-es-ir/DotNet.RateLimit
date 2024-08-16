@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using DotNet.RateLimiter.Interfaces;
+﻿using DotNet.RateLimiter.Interfaces;
 using Microsoft.Extensions.Logging;
 using RedLockNet;
 using StackExchange.Redis;
+using System;
+using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations
 {

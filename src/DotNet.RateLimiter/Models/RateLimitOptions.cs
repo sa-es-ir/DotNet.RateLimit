@@ -6,7 +6,7 @@ namespace DotNet.RateLimiter.Models
     {
         public RateLimitOptions()
         {
-            IpWhiteList = new List<string>();
+            IpWhiteList = [];
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace DotNet.RateLimiter.Models
         public string RedisConnection { get; set; }
 
         /// <summary>
-        /// list of Ips that rate limit will by-pass for them
+        /// hashset of Ips that rate limit will by-pass for them
         /// </summary>
-        public List<string> IpWhiteList { get; set; }
+        public HashSet<string> IpWhiteList { get; set; }
 
         /// <summary>
         /// consider how retrieve IP address from request header default is X-Forwarded-For.

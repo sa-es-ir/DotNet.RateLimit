@@ -1,16 +1,15 @@
-﻿using System;
+﻿using DotNet.RateLimiter.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using DotNet.RateLimiter.Interfaces;
 
 namespace DotNet.RateLimiter.Implementations
 {
     public class RateLimitBackgroundTaskQueue : IRateLimitBackgroundTaskQueue
     {
-        private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems =
-            new ConcurrentQueue<Func<CancellationToken, Task>>();
-        private readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
+        private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new();
+        private readonly SemaphoreSlim _signal = new(0);
 
         public void QueueBackgroundWorkItem(
             Func<CancellationToken, Task> workItem)

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotNet.RateLimiter.Models;
+﻿namespace DotNet.RateLimiter.Models;
 
 public class RateLimitParams
 {

@@ -1,9 +1,9 @@
-﻿using System;
-using DotNet.RateLimiter.EndPointFilters;
+﻿using DotNet.RateLimiter.EndPointFilters;
 using DotNet.RateLimiter.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace DotNet.RateLimiter.Extensions
 {
@@ -18,7 +18,7 @@ namespace DotNet.RateLimiter.Extensions
             ObjectFactory filterFactory;
             try
             {
-                filterFactory = ActivatorUtilities.CreateFactory(typeof(RateLimitEndPointFilter), new[] { typeof(EndpointFilterFactoryContext) });
+                filterFactory = ActivatorUtilities.CreateFactory(typeof(RateLimitEndPointFilter), [typeof(EndpointFilterFactoryContext)]);
             }
             catch (InvalidOperationException)
             {
