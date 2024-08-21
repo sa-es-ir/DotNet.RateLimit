@@ -49,7 +49,11 @@ namespace DotNet.RateLimiter
             else
             {
                 services.AddMemoryCache();
-                services.AddSingleton(new AsyncKeyedLocker<string>());
+                services.AddSingleton(new AsyncKeyedLocker<string>(o =>
+                {
+                    o.PoolSize = 20;
+                    o.PoolInitialFill = 1;
+                }));
                 services.AddScoped<IRateLimitService, InMemoryRateLimitService>();
             }
         }
