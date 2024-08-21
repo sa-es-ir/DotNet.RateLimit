@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using AsyncKeyedLock;
+﻿using AsyncKeyedLock;
 using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations
 {

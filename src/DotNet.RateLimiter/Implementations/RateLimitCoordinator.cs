@@ -1,19 +1,18 @@
-﻿using DotNet.RateLimiter.Interfaces;
+﻿using DotNet.RateLimiter.ActionFilters;
+using DotNet.RateLimiter.Extensions;
+using DotNet.RateLimiter.Interfaces;
+using DotNet.RateLimiter.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
-using DotNet.RateLimiter.Models;
-using Microsoft.AspNetCore.Routing;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using DotNet.RateLimiter.ActionFilters;
-using System.Text;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
-using DotNet.RateLimiter.Extensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations;
 
@@ -22,6 +21,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     private readonly ILogger<RateLimitCoordinator> _logger;
     private readonly IRateLimitService _rateLimitService;
     private readonly IOptions<RateLimitOptions> _options;
+    private static readonly char[] _separator = [','];
 
     public RateLimitCoordinator(ILogger<RateLimitCoordinator> logger,
         IRateLimitService rateLimitService,
@@ -153,7 +153,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     {
         if (!string.IsNullOrWhiteSpace(ratelimitParams.RouteParams))
         {
-            var parameters = ratelimitParams.RouteParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var parameters = ratelimitParams.RouteParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
                 if (httpContext.GetRouteData().Values.TryGetValue(parameter, out var routeValue))
@@ -163,7 +163,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
         if (!string.IsNullOrWhiteSpace(ratelimitParams.QueryParams))
         {
-            var parameters = ratelimitParams.QueryParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var parameters = ratelimitParams.QueryParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
                 if (httpContext.Request.Query.TryGetValue(parameter, out var queryParams))
@@ -190,7 +190,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     {
         if (!string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
         {
-            var parameters = ratelimitParams.BodyParams.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
             var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
             var obj = JObject.Parse(jsonSerializer);
 

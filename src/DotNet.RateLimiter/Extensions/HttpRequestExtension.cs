@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Microsoft.AspNetCore.Http;
 
 namespace DotNet.RateLimiter.Extensions
 {
@@ -10,12 +10,8 @@ namespace DotNet.RateLimiter.Extensions
     {
         public static IPAddress GetUserIp(this HttpRequest request, string headerName)
         {
-            if (request.Headers[headerName].FirstOrDefault() != null)
-            {
-                return request.Headers[headerName].FirstOrDefault().GetIpAddresses().FirstOrDefault();
-            }
-
-            return request.HttpContext.Connection.RemoteIpAddress;
+            return request.Headers[headerName].FirstOrDefault()?.GetIpAddresses()?.FirstOrDefault() ??
+                request.HttpContext.Connection.RemoteIpAddress;
         }
 
         public static List<IPAddress> GetIpAddresses(this string ips, string separator = ",")
