@@ -50,7 +50,7 @@ jobs:
       run: |
         dotnet pack src/DotNet.RateLimiter/DotNet.RateLimiter.csproj -p:PackageVersion=${{ github.event.inputs.versionIncrement }} -c Release
     - name: Upload NuGet package to GitHub
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: nugetPackage
         path: src/DotNet.RateLimiter/bin/Release/ 
@@ -63,7 +63,7 @@ jobs:
     steps:  
     #Push NuGet package to GitHub packages
     - name: Download nuget package artifact
-      uses: actions/download-artifact@v1.0.0
+      uses: actions/download-artifact@v4
       with:
         name: nugetPackage
     - name: Prep packages
