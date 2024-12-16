@@ -53,7 +53,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: nugetPackage
-        path: nugetPackage
+        path: src/DotNet.RateLimiter/bin/Release/
         
   release:
     runs-on: ubuntu-latest    
@@ -66,7 +66,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: nugetPackage
-        path: nugetPackage
+        path: src/DotNet.RateLimiter/bin/Release/
     - name: Prep packages
       run: dotnet nuget add source --username sa-es-ir --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/sa-es-ir/index.json"
     - name: Push package to GitHub packages 
