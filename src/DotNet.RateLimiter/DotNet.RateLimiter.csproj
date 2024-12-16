@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;netstandard2.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net9.0</TargetFrameworks>
 		<AssemblyName>DotNet.RateLimiter</AssemblyName>
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
-		<Version>2.0.0</Version>
+		<Version>3.0.1</Version>
 		<LangVersion>preview</LangVersion>
 		<Authors>Saeed Esmaeelinejad</Authors>
 		<PackageId>DotNetRateLimiter</PackageId>
@@ -15,18 +15,10 @@
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/sa-es-ir/DotNet.RateLimit</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<Description>DotNet Rate Limit for control request rate on Action or Controller and MinimalApi, it supports in-memory and redis</Description>
+		<Description>DotNet Rate Limit for control request rate on Action or Controller and MinimalApi, it supports in-memory cache and redis</Description>
 	</PropertyGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
-		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-
-	</ItemGroup>
-
-	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1' Or $(TargetFramework) == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
@@ -43,35 +35,15 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'net7.0'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-	</ItemGroup>
-
-	<ItemGroup Condition="$(TargetFramework) == 'net6.0'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-	</ItemGroup>
-
-	<ItemGroup Condition="$(TargetFramework) == 'net5.0'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition="$(TargetFramework) == 'netcoreapp3.1'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition="$(TargetFramework) == 'netcoreapp3.1' Or $(TargetFramework) == 'net5.0' Or $(TargetFramework) == 'net6.0' Or $(TargetFramework) == 'net7.0' Or $(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net9.0'">
+	<ItemGroup Condition="$(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net9.0'">
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AsyncKeyedLock" Version="7.0.1" />
+		<PackageReference Include="AsyncKeyedLock" Version="7.1.4" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="RedLock.net" Version="2.3.2" />
-		<PackageReference Include="StackExchange.Redis" Version="2.7.10" />
+		<PackageReference Include="StackExchange.Redis" Version="2.8.22" />
 	</ItemGroup>
 
 </Project>

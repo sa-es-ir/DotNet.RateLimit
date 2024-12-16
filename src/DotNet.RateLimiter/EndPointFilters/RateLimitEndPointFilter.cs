@@ -24,7 +24,10 @@ public class RateLimitEndPointFilter : IEndpointFilter
     {
         var rateLimitParams = context.HttpContext.Features.Get<RateLimitEndPointParams>();
 
-        ArgumentNullException.ThrowIfNull(nameof(rateLimitParams));
+        if (rateLimitParams == null)
+        {
+            throw new ArgumentNullException(nameof(rateLimitParams));
+        }
 
         var goodToGo = await _rateLimitCoordinator.CheckRateLimitAsync(context, rateLimitParams);
 
@@ -42,5 +45,4 @@ public class RateLimitEndPointFilter : IEndpointFilter
         }
     }
 }
-
 #endif
