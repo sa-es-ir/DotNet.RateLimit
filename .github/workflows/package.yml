@@ -64,8 +64,8 @@ jobs:
     #Push NuGet package to GitHub packages
     - name: Download nuget package artifact
       uses: actions/download-artifact@v4
-      with:
-        path: src/DotNet.RateLimiter/bin/Release/
+    - name: List files
+      run: ls -R
     - name: Prep packages
       run: dotnet nuget add source --username sa-es-ir --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/sa-es-ir/index.json"
     - name: Push package to GitHub packages 
