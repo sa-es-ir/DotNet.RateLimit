@@ -16,6 +16,9 @@ namespace DotNet.RateLimiter.Implementations
         private readonly TimeSpan _lockExpiry = TimeSpan.FromSeconds(300);
         private readonly TimeSpan _lockWait = TimeSpan.FromSeconds(120);
         private readonly TimeSpan _lockRetry = TimeSpan.FromMilliseconds(500);
+#if NETSTANDARD2_0
+        private static readonly DateTime _unixEpoch = new(1970, 1, 1);
+#endif
 
         public RedisRateLimitService(ILogger<RedisRateLimitService> logger,
             IRateLimitBackgroundTaskQueue backgroundTaskQueue,
@@ -34,9 +37,18 @@ namespace DotNet.RateLimiter.Implementations
 
             if (distributedLock.IsAcquired)
             {
+                DateTime now = DateTime.UtcNow;
+                long unixTimeStamp = (long)now.Subtract(
+#if NETSTANDARD2_0
+                _unixEpoch
+#else
+                DateTime.UnixEpoch
+#endif
+                ).TotalSeconds;
+
                 var counts = await _database.SortedSetLengthAsync(resourceKey,
-                    ToUtcTimestamp(DateTime.UtcNow.AddSeconds(-periodInSec)),
-                    ToUtcTimestamp(DateTime.UtcNow.AddSeconds(periodInSec)));
+                    unixTimeStamp - periodInSec,
+                    unixTimeStamp + periodInSec);
 
                 if (counts >= limit)
                 {
@@ -46,19 +58,14 @@ namespace DotNet.RateLimiter.Implementations
                 }
 
                 _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.SortedSetAddAsync(resourceKey,
-                    DateTime.UtcNow.Ticks,
-                    ToUtcTimestamp(DateTime.UtcNow), CommandFlags.FireAndForget));
+                    now.Ticks,
+                    unixTimeStamp, CommandFlags.FireAndForget));
 
                 _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.KeyExpireAsync(resourceKey,
                     TimeSpan.FromSeconds(periodInSec), CommandFlags.FireAndForget));
             }
 
             return true;
-        }
-
-        private long ToUtcTimestamp(DateTime dateTime)
-        {
-            return (long)dateTime.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         }
     }
 }

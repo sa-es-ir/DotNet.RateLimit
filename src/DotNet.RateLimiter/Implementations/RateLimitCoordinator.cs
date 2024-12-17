@@ -63,7 +63,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (ratelimitParams.Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
 
-            ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
+            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
 
             SetBodyParamsRateLimitKey(context, ratelimitParams, rateLimitKey);
 
@@ -137,7 +137,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 .Append(context.HttpContext.Request.Method)
                 .Append(context.HttpContext.GetEndpoint()?.DisplayName);
 
-            ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
+            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
 
             return await _rateLimitService.HasAccessAsync(rateLimitKey.ToString(), ratelimitParams.PeriodInSec, ratelimitParams.Limit);
         }
@@ -149,7 +149,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     }
 #endif
 
-    private void ProvideRateLimitKey(HttpContext httpContext, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
+    private static void ProvideRateLimitKey(HttpContext httpContext, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
     {
         if (!string.IsNullOrWhiteSpace(ratelimitParams.RouteParams))
         {
@@ -175,7 +175,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                         case 0:
                             continue;
                         case 1:
-                            rateLimitKey.Append(items[0]).Append(":");
+                            rateLimitKey.Append(items[0]).Append(':');
                             break;
                         default:
                             rateLimitKey.Append(string.Join(":", items));
@@ -201,7 +201,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
                 if (rootProperty is JProperty property)
                 {
-                    rateLimitKey.Append(property.Value).Append(":");
+                    rateLimitKey.Append(property.Value).Append(':');
                 }
             }
         }
