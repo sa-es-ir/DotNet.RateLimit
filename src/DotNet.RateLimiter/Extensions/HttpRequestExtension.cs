@@ -15,7 +15,7 @@ namespace DotNet.RateLimiter.Extensions
         public static IPAddress GetIpAddress(this string ips, string separator = ",")
         {
             var position = ips.IndexOf(separator);
-            if (position >= 6 && IPAddress.TryParse(ips.Substring(0, position + 1).Trim(), out var ipAddress))
+            if (position >= 0 && IPAddress.TryParse(ips.Substring(0, position + 1).Trim(), out var ipAddress))
             {
                 return ipAddress;
             }
