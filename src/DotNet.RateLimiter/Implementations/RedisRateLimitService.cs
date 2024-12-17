@@ -13,9 +13,9 @@ namespace DotNet.RateLimiter.Implementations
         private readonly ILogger<RedisRateLimitService> _logger;
         private readonly IRateLimitBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IDistributedLockFactory _lockFactory;
-        private readonly TimeSpan _lockExpiry = TimeSpan.FromSeconds(300);
-        private readonly TimeSpan _lockWait = TimeSpan.FromSeconds(120);
-        private readonly TimeSpan _lockRetry = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan _lockExpiry = TimeSpan.FromSeconds(300);
+        private static readonly TimeSpan _lockWait = TimeSpan.FromSeconds(120);
+        private static readonly TimeSpan _lockRetry = TimeSpan.FromMilliseconds(500);
 #if NETSTANDARD2_0
         private static readonly DateTime _unixEpoch = new(1970, 1, 1);
 #endif
