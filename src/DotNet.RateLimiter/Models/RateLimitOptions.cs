@@ -27,7 +27,7 @@ namespace DotNet.RateLimiter.Models
         /// <summary>
         /// if redis connection present then use redis for rate limit
         /// </summary>
-        public bool HasRedis => !string.IsNullOrEmpty(RedisConnection?.Trim());
+        public bool HasRedis => !string.IsNullOrWhiteSpace(RedisConnection);
 
         /// <summary>
         /// redis connection
@@ -52,7 +52,7 @@ namespace DotNet.RateLimiter.Models
         /// <summary>
         /// list of client identifiers that rate limit will by-pass for them
         /// </summary>
-        public List<string> ClientIdentifierWhiteList { get; set; }
+        public HashSet<string> ClientIdentifierWhiteList { get; set; }
 
     }
 }
