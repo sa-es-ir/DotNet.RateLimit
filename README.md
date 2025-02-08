@@ -136,10 +136,10 @@ RateLimitOption in appsettings.json
     "EnableRateLimit": true, //Optional: if set false rate limit will be disabled, default is true
     "HttpStatusCode": 429, //Optional: default is 429
     "ErrorMessage": "Rate limit Exceeded", //Optional: default is Rate limit Exceeded
-    "IpHeaderName": "X-Forwarded-For" //Optional: header name for get Ip address, default is X-Forwarded-For
+    "IpHeaderName": "X-Forwarded-For" //Optional: header name for getting the IP address, default is X-Forwarded-For
     "RedisConnection": "127.0.0.1:6379", //Optional
     "IpWhiteList": ["::1"], //Optional
-    "ClientIdentifier": "X-Client-Id" ////Optional: for getting client id from request header if this present the rate limit will not use IP for limit requests
-    "ClientIdentifierWhiteList": ["test-client"] ////Optional
+    "ClientIdentifier": "X-Client-Id" //Optional: for getting client id from the request header if this is present the rate limit won't use IP but ClientId
+    "ClientIdentifierWhiteList": ["test-client"] //Optional
   }
 ```
