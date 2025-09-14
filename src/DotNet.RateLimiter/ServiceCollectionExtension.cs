@@ -87,10 +87,10 @@ namespace DotNet.RateLimiter
 
                 // Use the provided connection multiplexer - only add if not already registered
                 services.TryAddSingleton(connectionMultiplexer);
-                services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+                services.TryAddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
                 // Create distributed lock factory with existing connection
-                services.AddSingleton<IDistributedLockFactory>(provider =>
+                services.TryAddSingleton<IDistributedLockFactory>(provider =>
                 {
                     return RedLockFactory.Create(new List<RedLockMultiplexer>()
                     {
@@ -101,7 +101,7 @@ namespace DotNet.RateLimiter
             else
             {
                 services.AddMemoryCache();
-                services.AddSingleton(new AsyncKeyedLocker<string>(o =>
+                services.TryAddSingleton(new AsyncKeyedLocker<string>(o =>
                 {
                     o.PoolSize = 20;
                     o.PoolInitialFill = 1;
@@ -137,7 +137,7 @@ namespace DotNet.RateLimiter
                 services.TryAddSingleton(multiplexer);
 
                 // Create distributed lock factory with existing connection
-                services.AddSingleton<IDistributedLockFactory>(provider =>
+                services.TryAddSingleton<IDistributedLockFactory>(provider =>
                 {
                     return RedLockFactory.Create(new List<RedLockMultiplexer>()
                     {
@@ -148,7 +148,7 @@ namespace DotNet.RateLimiter
             else
             {
                 services.AddMemoryCache();
-                services.AddSingleton(new AsyncKeyedLocker<string>(o =>
+                services.TryAddSingleton(new AsyncKeyedLocker<string>(o =>
                 {
                     o.PoolSize = 20;
                     o.PoolInitialFill = 1;
