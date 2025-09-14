@@ -5,6 +5,7 @@ using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
@@ -84,8 +85,8 @@ namespace DotNet.RateLimiter
                 services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
                 services.AddHostedService<QueuedHostedService>();
 
-                // Use the provided connection multiplexer
-                services.AddSingleton(connectionMultiplexer);
+                // Use the provided connection multiplexer - only add if not already registered
+                services.TryAddSingleton(connectionMultiplexer);
                 services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
                 // Create distributed lock factory with existing connection
@@ -130,10 +131,10 @@ namespace DotNet.RateLimiter
                 services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
                 services.AddHostedService<QueuedHostedService>();
 
-                // Use the provided database and get its multiplexer for distributed lock
-                services.AddSingleton(database);
+                // Use the provided database and get its multiplexer for distributed lock - only add if not already registered
+                services.TryAddSingleton(database);
                 var multiplexer = database.Multiplexer;
-                services.AddSingleton(multiplexer);
+                services.TryAddSingleton(multiplexer);
 
                 // Create distributed lock factory with existing connection
                 services.AddSingleton<IDistributedLockFactory>(provider =>
