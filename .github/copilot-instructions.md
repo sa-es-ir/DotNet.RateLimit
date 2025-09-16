@@ -16,8 +16,8 @@ Always install both .NET 9.0 SDK and .NET 8.0 runtime components first:
 - `dotnet restore` -- takes 20 seconds. NEVER CANCEL. Set timeout to 3+ minutes.
 - `dotnet build` -- takes 10 seconds with 2 warnings (expected). NEVER CANCEL. Set timeout to 3+ minutes.
 - `dotnet test` -- takes 15 seconds, runs 36 tests. NEVER CANCEL. Set timeout to 3+ minutes.
-  - NOTE: Many tests fail by design (16 failures expected) as they validate rate limiting behavior
-  - Tests pass when rate limiting correctly returns 429 status codes
+  - All tests pass successfully, validating rate limiting behavior works correctly
+  - Tests verify rate limiting properly returns 429 status codes when limits are exceeded
 - `dotnet pack src/DotNet.RateLimiter/DotNet.RateLimiter.csproj -c Release` -- takes 4 seconds for packaging
 
 ### Run the Demo Application
@@ -34,7 +34,7 @@ Always install both .NET 9.0 SDK and .NET 8.0 runtime components first:
   - `curl -k https://localhost:7196/rate-limit-on-actions` (first 3 requests should return 200)
   - `curl -k https://localhost:7196/rate-limit-on-actions` (4th+ requests should return 429)
 - ALWAYS test with the demo application to ensure end-to-end functionality works
-- ALWAYS run all tests with `dotnet test` and verify expected failure patterns remain consistent
+- ALWAYS run all tests with `dotnet test` and verify all tests pass successfully
 
 ## Common Tasks
 
@@ -95,8 +95,8 @@ demo/DotNet.RateLimiter.Demo/DotNet.RateLimiter.Demo.csproj
 
 # Test summary (expected results)
 dotnet test
-Test summary: total: 36, failed: 16, succeeded: 20, skipped: 0
-# NOTE: 16 failures are expected - they validate rate limiting behavior
+Test summary: total: 36, failed: 0, succeeded: 36, skipped: 0
+# All tests pass successfully - rate limiting behavior is validated correctly
 ```
 
 ### Troubleshooting
