@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -8,18 +10,29 @@ namespace DotNet.RateLimiter.Extensions
     {
         public static IPAddress GetUserIp(this HttpRequest request, string headerName)
         {
-            return request.Headers[headerName].FirstOrDefault()?.GetIpAddress() ??
-                request.HttpContext.Connection.RemoteIpAddress;
+            if (request.Headers[headerName].FirstOrDefault() != null)
+            {
+                return request.Headers[headerName].FirstOrDefault().GetIpAddresses().FirstOrDefault();
+            }
+
+            return request.HttpContext.Connection.RemoteIpAddress;
         }
 
-        public static IPAddress GetIpAddress(this string ips, string separator = ",")
+        public static List<IPAddress> GetIpAddresses(this string ips, string separator = ",")
         {
-            var position = ips.IndexOf(separator);
-            if (position >= 0 && IPAddress.TryParse(ips.Substring(0, position + 1).Trim(), out var ipAddress))
+            var ipAddresses = new List<IPAddress>();
+            var ipList = ips.Split([separator], StringSplitOptions.RemoveEmptyEntries);
+
+            if (ipList.Length == 0)
+                return default;
+
+            foreach (var ip in ipList)
             {
-                return ipAddress;
+                if (IPAddress.TryParse(ip.Trim(), out var ipAddress))
+                    ipAddresses.Add(ipAddress);
             }
-            return null;
+
+            return ipAddresses;
         }
     }
 }
