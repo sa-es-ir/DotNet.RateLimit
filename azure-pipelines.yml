@@ -22,7 +22,16 @@ steps:
   displayName: 'Use .NET 8 SDK'
   inputs:
     packageType: 'sdk'
-    version: '9.x'
+    version: '8.x.x'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 9 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '9.x.x'
+
+- script: dotnet --list-sdks
+  displayName: 'List installed .NET SDKs'
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore'
