@@ -5,6 +5,7 @@ using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
@@ -15,6 +16,11 @@ namespace DotNet.RateLimiter
 {
     public static class ServiceCollectionExtension
     {
+        /// <summary>
+        /// Adds rate limiting service using configuration. For Redis, it creates new connections.
+        /// </summary>
+        /// <param name="services">Service collection</param>
+        /// <param name="configuration">Configuration containing RateLimitOption section</param>
         public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
@@ -56,6 +62,67 @@ namespace DotNet.RateLimiter
                 }));
                 services.AddScoped<IRateLimitService, InMemoryRateLimitService>();
             }
+        }
+
+        /// <summary>
+        /// Adds rate limiting service using configuration with existing Redis connection multiplexer.
+        /// </summary>
+        /// <param name="services">Service collection</param>
+        /// <param name="configuration">Configuration containing RateLimitOption section</param>
+        /// <param name="connectionMultiplexer">Existing Redis connection multiplexer to use</param>
+        public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration, IConnectionMultiplexer connectionMultiplexer)
+        {
+            services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
+            services.AddScoped<RateLimitAttribute>();
+            services.AddScoped<IRateLimitCoordinator, RateLimitCoordinator>();
+
+            services.AddScoped<IRateLimitService, RedisRateLimitService>();
+            services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
+            services.AddHostedService<QueuedHostedService>();
+
+            // Use the provided connection multiplexer - only add if not already registered
+            services.TryAddSingleton(connectionMultiplexer);
+            services.TryAddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+
+            // Create distributed lock factory with existing connection
+            services.TryAddSingleton<IDistributedLockFactory>(provider =>
+            {
+                return RedLockFactory.Create(new List<RedLockMultiplexer>()
+                {
+                        (ConnectionMultiplexer)connectionMultiplexer
+                });
+            });
+        }
+
+        /// <summary>
+        /// Adds rate limiting service using configuration with existing Redis database.
+        /// </summary>
+        /// <param name="services">Service collection</param>
+        /// <param name="configuration">Configuration containing RateLimitOption section</param>
+        /// <param name="database">Existing Redis database to use</param>
+        public static void AddRateLimitService(this IServiceCollection services, IConfiguration configuration, IDatabase database)
+        {
+            services.Configure<RateLimitOptions>(configuration.GetSection("RateLimitOption"));
+            services.AddScoped<RateLimitAttribute>();
+            services.AddScoped<IRateLimitCoordinator, RateLimitCoordinator>();
+
+            services.AddScoped<IRateLimitService, RedisRateLimitService>();
+            services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
+            services.AddHostedService<QueuedHostedService>();
+
+            // Use the provided database and get its multiplexer for distributed lock - only add if not already registered
+            services.TryAddSingleton(database);
+            var multiplexer = database.Multiplexer;
+            services.TryAddSingleton(multiplexer);
+
+            // Create distributed lock factory with existing connection
+            services.TryAddSingleton<IDistributedLockFactory>(provider =>
+            {
+                return RedLockFactory.Create(new List<RedLockMultiplexer>()
+                {
+                        (ConnectionMultiplexer)multiplexer
+                });
+            });
         }
     }
 }

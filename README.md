@@ -25,6 +25,30 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRateLimitService(builder.Configuration);
 ```
+
+### Using Existing Redis Connections
+
+If your application already has Redis infrastructure, you can reuse existing connections instead of creating new ones:
+
+```csharp
+using DotNet.RateLimiter;
+using StackExchange.Redis;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Setup your existing Redis connection
+var multiplexer = ConnectionMultiplexer.Connect("your-connection-string");
+builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+
+// Use existing connection with rate limiting
+builder.Services.AddRateLimitService(builder.Configuration, multiplexer);
+
+// Or use existing database
+var database = multiplexer.GetDatabase();
+builder.Services.AddRateLimitService(builder.Configuration, database);
+```
+
+📖 **[Read more about using existing Redis connections](USAGE_EXISTING_REDIS.md)**
 ## How to use
 You can see the **Demo** project to know how to use it in all scenarios and also you can follow this article in [**Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
 ### Simple usage
