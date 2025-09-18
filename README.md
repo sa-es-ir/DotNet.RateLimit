@@ -47,6 +47,8 @@ builder.Services.AddRateLimitService(builder.Configuration, multiplexer);
 var database = multiplexer.GetDatabase();
 builder.Services.AddRateLimitService(builder.Configuration, database);
 ```
+
+📖 **[Read more about using existing Redis connections](USAGE_EXISTING_REDIS.md)**
 ## How to use
 You can see the **Demo** project to know how to use it in all scenarios and also you can follow this article in [**Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
 ### Simple usage
