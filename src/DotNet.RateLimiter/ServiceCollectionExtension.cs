@@ -48,7 +48,7 @@ namespace DotNet.RateLimiter
 
                     return RedLockFactory.Create(new List<RedLockMultiplexer>()
                     {
-                        ConnectionMultiplexer.Connect(config)
+                        new RedLockMultiplexer(ConnectionMultiplexer.Connect(config))
                     });
                 });
             }
@@ -89,7 +89,7 @@ namespace DotNet.RateLimiter
             {
                 return RedLockFactory.Create(new List<RedLockMultiplexer>()
                 {
-                        (ConnectionMultiplexer)connectionMultiplexer
+                        new RedLockMultiplexer(connectionMultiplexer)
                 });
             });
         }
@@ -120,7 +120,7 @@ namespace DotNet.RateLimiter
             {
                 return RedLockFactory.Create(new List<RedLockMultiplexer>()
                 {
-                        (ConnectionMultiplexer)multiplexer
+                        new RedLockMultiplexer(multiplexer)
                 });
             });
         }
