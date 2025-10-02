@@ -6,11 +6,7 @@ using DotNet.RateLimiter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using RedLockNet;
-using RedLockNet.SERedis;
-using RedLockNet.SERedis.Configuration;
 using StackExchange.Redis;
-using System.Collections.Generic;
 
 namespace DotNet.RateLimiter
 {
@@ -33,24 +29,11 @@ namespace DotNet.RateLimiter
             if (options.HasRedis)
             {
                 services.AddScoped<IRateLimitService, RedisRateLimitService>();
-                services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
-                services.AddHostedService<QueuedHostedService>();
 
                 //configure redis 
                 var redisConfig = ConfigurationOptions.Parse(options.RedisConnection);
                 services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
                 services.AddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
-
-                //add red lock for distributed lock
-                services.AddSingleton<IDistributedLockFactory>(provider =>
-                {
-                    var config = ConfigurationOptions.Parse(options.RedisConnection);
-
-                    return RedLockFactory.Create(new List<RedLockMultiplexer>()
-                    {
-                        new RedLockMultiplexer(ConnectionMultiplexer.Connect(config))
-                    });
-                });
             }
             else
             {
@@ -77,21 +60,10 @@ namespace DotNet.RateLimiter
             services.AddScoped<IRateLimitCoordinator, RateLimitCoordinator>();
 
             services.AddScoped<IRateLimitService, RedisRateLimitService>();
-            services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
-            services.AddHostedService<QueuedHostedService>();
 
             // Use the provided connection multiplexer - only add if not already registered
             services.TryAddSingleton(connectionMultiplexer);
             services.TryAddTransient<IDatabase>(provider => provider.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
-
-            // Create distributed lock factory with existing connection
-            services.TryAddSingleton<IDistributedLockFactory>(provider =>
-            {
-                return RedLockFactory.Create(new List<RedLockMultiplexer>()
-                {
-                        new RedLockMultiplexer(connectionMultiplexer)
-                });
-            });
         }
 
         /// <summary>
@@ -107,22 +79,11 @@ namespace DotNet.RateLimiter
             services.AddScoped<IRateLimitCoordinator, RateLimitCoordinator>();
 
             services.AddScoped<IRateLimitService, RedisRateLimitService>();
-            services.AddSingleton<IRateLimitBackgroundTaskQueue, RateLimitBackgroundTaskQueue>();
-            services.AddHostedService<QueuedHostedService>();
 
-            // Use the provided database and get its multiplexer for distributed lock - only add if not already registered
+            // Use the provided database and get its multiplexer - only add if not already registered
             services.TryAddSingleton(database);
             var multiplexer = database.Multiplexer;
             services.TryAddSingleton(multiplexer);
-
-            // Create distributed lock factory with existing connection
-            services.TryAddSingleton<IDistributedLockFactory>(provider =>
-            {
-                return RedLockFactory.Create(new List<RedLockMultiplexer>()
-                {
-                        new RedLockMultiplexer(multiplexer)
-                });
-            });
         }
     }
 }
