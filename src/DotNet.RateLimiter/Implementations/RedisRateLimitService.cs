@@ -6,31 +6,34 @@ using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations
 {
-    public class RedisRateLimitService : IRateLimitService
+    public class RedisRateLimitService(
+        ILogger<RedisRateLimitService> logger,
+        IDatabase database)
+        : IRateLimitService
     {
-        private readonly IDatabase _database;
-        private readonly ILogger<RedisRateLimitService> _logger;
-
-        public RedisRateLimitService(
-            ILogger<RedisRateLimitService> logger,
-            IDatabase database)
-        {
-            _logger = logger;
-            _database = database;
-        }
+        // Lua script for atomic INCR with conditional EXPIRE
+        // This ensures the counter is incremented and TTL is set atomically
+        private const string LuaScript = @"
+            local current = redis.call('INCR', KEYS[1])
+            if current == 1 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+            return current
+        ";
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            var count = await _database.StringIncrementAsync(resourceKey);
+            // Execute Lua script to atomically increment counter and set TTL on first request
+            var count = (long)await database.ScriptEvaluateAsync(
+                LuaScript,
+                [resourceKey],
+                [periodInSec]
+            );
 
-            if (count == 1)
-            {
-                await _database.KeyExpireAsync(resourceKey, TimeSpan.FromSeconds(periodInSec));
-            }
-
+            // Check if rate limit is exceeded
             if (count > limit)
             {
-                _logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {count}");
+                logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {count}");
                 return false;
             }
 
