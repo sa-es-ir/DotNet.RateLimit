@@ -1,71 +1,44 @@
 ﻿using DotNet.RateLimiter.Interfaces;
 using Microsoft.Extensions.Logging;
-using RedLockNet;
 using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations
 {
-    public class RedisRateLimitService : IRateLimitService
+    public class RedisRateLimitService(
+        ILogger<RedisRateLimitService> logger,
+        IDatabase database)
+        : IRateLimitService
     {
-        private readonly IDatabase _database;
-        private readonly ILogger<RedisRateLimitService> _logger;
-        private readonly IRateLimitBackgroundTaskQueue _backgroundTaskQueue;
-        private readonly IDistributedLockFactory _lockFactory;
-        private static readonly TimeSpan _lockExpiry = TimeSpan.FromSeconds(300);
-        private static readonly TimeSpan _lockWait = TimeSpan.FromSeconds(120);
-        private static readonly TimeSpan _lockRetry = TimeSpan.FromMilliseconds(500);
-#if NETSTANDARD2_0
-        private static readonly DateTime _unixEpoch = new(1970, 1, 1);
-#endif
-
-        public RedisRateLimitService(ILogger<RedisRateLimitService> logger,
-            IRateLimitBackgroundTaskQueue backgroundTaskQueue,
-            IDatabase database,
-            IDistributedLockFactory lockFactory)
-        {
-            _logger = logger;
-            _backgroundTaskQueue = backgroundTaskQueue;
-            _database = database;
-            _lockFactory = lockFactory;
-        }
+        // Lua script for atomic INCR with conditional EXPIRE
+        // This ensures the counter is incremented and TTL is set atomically
+        private const string LuaScript = @"
+            local current = redis.call('INCR', KEYS[1])
+            if current == 1 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+            return current
+        ";
 
         public async Task<bool> HasAccessAsync(string resourceKey, int periodInSec, int limit)
         {
-            await using var distributedLock = await _lockFactory.CreateLockAsync(resourceKey, _lockExpiry, _lockWait, _lockRetry);
+            // Execute Lua script to atomically increment counter and set TTL on first request
+            var count = (long)await database.ScriptEvaluateAsync(
+                LuaScript,
+                [resourceKey],
+                [periodInSec]
+            );
 
-            if (distributedLock.IsAcquired)
+            // Check if rate limit is exceeded
+            if (count > limit)
             {
-                DateTime now = DateTime.UtcNow;
-                long unixTimeStamp = (long)now.Subtract(
-#if NETSTANDARD2_0
-                _unixEpoch
-#else
-                DateTime.UnixEpoch
-#endif
-                ).TotalSeconds;
-
-                var counts = await _database.SortedSetLengthAsync(resourceKey,
-                    unixTimeStamp - periodInSec,
-                    unixTimeStamp + periodInSec);
-
-                if (counts >= limit)
-                {
-                    _logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {counts}");
-
-                    return false;
-                }
-
-                _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.SortedSetAddAsync(resourceKey,
-                    now.Ticks,
-                    unixTimeStamp, CommandFlags.FireAndForget));
-
-                _backgroundTaskQueue.QueueBackgroundWorkItem(token => _database.KeyExpireAsync(resourceKey,
-                    TimeSpan.FromSeconds(periodInSec), CommandFlags.FireAndForget));
+                logger.LogCritical($"DotNet.RateLimiter:: key: {resourceKey} - count: {count}");
+                return false;
             }
 
             return true;
         }
     }
+
 }
