@@ -1,7 +1,7 @@
 <p align="center"><img src="rate-limit.webp" width="300"></p>
 
 <div align="center">
-	
+
 [![Build Status](https://dev.azure.com/SaeedDevOps/Top_Engineering/_apis/build/status%2Fsa-es-ir.DotNet.RateLimit?branchName=refs%2Fpull%2F30%2Fmerge)](https://dev.azure.com/SaeedDevOps/Top_Engineering/_build/latest?definitionId=4&branchName=refs%2Fpull%2F30%2Fmerge)
 [![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![NuGet](https://img.shields.io/nuget/dt/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
@@ -10,14 +10,21 @@
 
 # DotNetRateLimiter
 
-This is a RateLimit that works with ActionFilters and EndPointFilters! An approach designed to control the request rate for a specific Action, Controller, or minimal endpoint. The idea behind this solution is to solve the middleware problem because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0) affects all requests, but with filters, you can limit some of the critical endpoints.
+This is a RateLimit that works with ActionFilters and EndPointFilters! An approach designed to control the request rate
+for a specific Action, Controller, or minimal endpoint. The idea behind this solution is to solve the middleware problem
+because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0)
+affects all requests, but with filters, you can limit some of the critical endpoints.
 
-Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection it will use Redis, it is recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP address but you can set ClientId in request headers and the header name is configurable.
+Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection it will use Redis, it is
+recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP
+address but you can set ClientId in request headers and the header name is configurable.
 
 ## Thank you for giving a ⭐ to this repo!
 
 ## How to add in DI
+
 You can add RateLimit in Startup like this:
+
 ```csharp
 using DotNet.RateLimiter;
 
@@ -49,10 +56,16 @@ builder.Services.AddRateLimitService(builder.Configuration, database);
 ```
 
 📖 **[Read more about using existing Redis connections](USAGE_EXISTING_REDIS.md)**
+
 ## How to use
-You can see the **Demo** project to know how to use it in all scenarios and also you can follow this article in [**Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
+
+You can see the **Demo** project to know how to use it in all scenarios and also you can follow this article in [*
+*Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
+
 ### Simple usage
+
 Using RateLimit without any parameters
+
 ```csharp
 [HttpGet("")]
 [RateLimit(PeriodInSec = 60, Limit = 3)]
@@ -61,7 +74,9 @@ public IEnumerable<WeatherForecast> Get()
     ....
 }
 ```
+
 For MinimalAPI **.NET 7+**
+
 ```csharp
 app.MapGet("/weatherforecast", () =>
 {
@@ -73,7 +88,9 @@ app.MapGet("/weatherforecast", () =>
     options.Limit = 3;
 });
 ```
+
 ### Using Route parameters
+
 ```csharp
 [HttpGet("by-route/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id")]
@@ -82,7 +99,9 @@ public IEnumerable<WeatherForecast> Get(int id)
    ....
 }
 ```
+
 For MinimalAPI **.NET 7+**
+
 ```csharp
 app.MapGet("/weatherforecast/{id}", (int id) =>
 {
@@ -95,7 +114,9 @@ app.MapGet("/weatherforecast/{id}", (int id) =>
     options.RouteParams = "id";
 });
 ```
+
 ### Using Query parameters
+
 ```csharp
 [HttpGet("by-query/{id}")]
 [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id", QueryParams = "name,family")]
@@ -104,7 +125,9 @@ public IEnumerable<WeatherForecast> Get(int id, string name, [FromQuery] List<st
     ....
 }
 ```
+
 For MinimalAPI **.NET 7+**
+
 ```csharp
 app.MapGet("/weatherforecast/{id}", (int id, string name, string family) =>
 {
@@ -118,23 +141,27 @@ app.MapGet("/weatherforecast/{id}", (int id, string name, string family) =>
     options.RouteParams = "id";
 });
 ```
+
 ### Using with Body parameters (Only for ActionFilters)
+
 ```csharp
 // body parameter only works on root parameters and does not work on nested parameters.
 [HttpPut]
-[RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "temperatureC" )]
-public IActionResult Update([FromBody] WeatherForecast weatherForecast)
+[RateLimit(PeriodInSec = 60, Limit = 3, BodyParams = "name" )]
+public IActionResult Update([FromBody] BodyRequest request)
 {
 	....
 }
 
-....
-  public class WeatherForecast
-    {
-        public int TemperatureC { get; set; }
-    }
+.... 
+public class BodyRequest 
+{
+  public string Name { get; set; }
+}
 ```
+
 ### Using on Controller
+
 ```csharp
 //if Scope set to Controller then the rate limit works on all actions and no matter which actions call
 //the default value is Action which means the rate limit checks each action separately
@@ -142,7 +169,9 @@ public IActionResult Update([FromBody] WeatherForecast weatherForecast)
 public class RateLimitOnAllController : ControllerBase
 { .... }
 ```
+
 ### Ignoring rate limit in case of use on Controller
+
 ```csharp
 [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
 public class RateLimitOnAllController : ControllerBase
@@ -155,8 +184,11 @@ public class RateLimitOnAllController : ControllerBase
     }
 }
 ```
+
 ### Custom configuration
+
 RateLimitOption in appsettings.json
+
 ```csharp
 "RateLimitOption": {
     "EnableRateLimit": true, //Optional: if set false rate limit will be disabled, default is true
