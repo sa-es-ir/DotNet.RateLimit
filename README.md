@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Build Status](https://dev.azure.com/SaeedDevOps/Top_Engineering/_apis/build/status%2Fsa-es-ir.DotNet.RateLimit?branchName=refs%2Fpull%2F30%2Fmerge)](https://dev.azure.com/SaeedDevOps/Top_Engineering/_build/latest?definitionId=4&branchName=refs%2Fpull%2F30%2Fmerge)
+[![Build Status](https://dev.azure.com/SaeedDevOps/Top_Engineering/_apis/build/status%2Fsa-es-ir.DotNet.RateLimit?branchName=main)](https://dev.azure.com/SaeedDevOps/Top_Engineering/_build/latest?definitionId=4&branchName=main)
 [![NuGet](https://img.shields.io/nuget/v/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![NuGet](https://img.shields.io/nuget/dt/DotNetRateLimiter.svg)](https://www.nuget.org/packages/DotNetRateLimiter/)
 [![GitHub stars](https://img.shields.io/github/stars/SaeedEsmaeelinejad/DotNet.RateLimit.svg)](https://github.com/SaeedEsmaeelinejad/DotNet.RateLimit/stargazers)
