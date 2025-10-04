@@ -20,6 +20,14 @@ namespace DotNet.RateLimiter.Models
         public string ErrorMessage { get; set; } = "Rate limit Exceeded";
 
         /// <summary>
+        /// custom JSON response structure for rate limit exceeded response.
+        /// Supports placeholders: $(ErrorMessage), $(HttpStatusCode).
+        /// If not set, uses default response structure with Message and Code properties.
+        /// Example: "{\"error\": {\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}}"
+        /// </summary>
+        public string ResponseStructure { get; set; }
+
+        /// <summary>
         /// if redis connection present then use redis for rate limit
         /// </summary>
         public bool HasRedis => !string.IsNullOrWhiteSpace(RedisConnection);

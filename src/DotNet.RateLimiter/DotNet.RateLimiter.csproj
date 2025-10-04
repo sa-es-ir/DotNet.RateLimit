@@ -18,6 +18,10 @@
 		<Description>DotNet Rate Limit for control request rate on Action or Controller and MinimalApi, it supports in-memory cache and redis</Description>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="DotNet.RateLimiter.Test" />
+	</ItemGroup>
+
 	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1' Or $(TargetFramework) == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />

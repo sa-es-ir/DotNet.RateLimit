@@ -1,7 +1,9 @@
 ﻿using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
+using DotNet.RateLimiter.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -35,13 +37,12 @@ public class RateLimitEndPointFilter : IEndpointFilter
             return await next(context);
         else
         {
-            var response = new RateLimitResponse()
-            {
-                Code = _options.Value.HttpStatusCode,
-                Message = _options.Value.ErrorMessage
-            };
-
-            return Results.Json(response, contentType: "application/json", statusCode: _options.Value.HttpStatusCode);
+            var responseBody = RateLimitResponseBuilder.BuildResponse(_options.Value);
+            
+            // Parse the JSON string to an object for Results.Json
+            var responseObject = JToken.Parse(responseBody);
+            
+            return Results.Json(responseObject, contentType: "application/json", statusCode: _options.Value.HttpStatusCode);
         }
     }
 }

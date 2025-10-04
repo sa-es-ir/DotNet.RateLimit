@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,7 @@ public class BaseRateLimitTest
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -51,7 +51,7 @@ public class BaseRateLimitTest
         //second request should be banned
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -66,14 +66,14 @@ public class BaseRateLimitTest
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
 
         actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress());
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -93,7 +93,7 @@ public class BaseRateLimitTest
         //second request should be banned but in case of white list ip it's ok
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -109,7 +109,7 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -127,7 +127,7 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -145,7 +145,7 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -163,7 +163,7 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -184,7 +184,7 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 
     [Theory]
@@ -201,6 +201,6 @@ public class BaseRateLimitTest
 
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
 
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)expectedResult);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)expectedResult);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
+using DotNet.RateLimiter.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -33,16 +34,10 @@ namespace DotNet.RateLimiter.ActionFilters
             else
             {
                 context.HttpContext.Response.StatusCode = _options.Value.HttpStatusCode;
-
                 context.HttpContext.Response.ContentType = "application/json";
 
-                var response = new RateLimitResponse()
-                {
-                    Code = _options.Value.HttpStatusCode,
-                    Message = _options.Value.ErrorMessage
-                };
-
-                await context.HttpContext.Response.WriteAsync(JsonConvert.SerializeObject(response));
+                var responseBody = RateLimitResponseBuilder.BuildResponse(_options.Value);
+                await context.HttpContext.Response.WriteAsync(responseBody);
             }
         }
     }
