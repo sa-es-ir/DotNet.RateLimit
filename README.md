@@ -201,3 +201,58 @@ RateLimitOption in appsettings.json
     "ClientIdentifierWhiteList": ["test-client"] //Optional
   }
 ```
+
+### Custom Response Structure
+
+You can customize the JSON response structure when rate limiting is triggered by using the `ResponseStructure` property in your configuration. This allows you to match your API's response format standards.
+
+**Configuration:**
+
+```json
+"RateLimitOption": {
+    "HttpStatusCode": 429,
+    "ErrorMessage": "Rate limit Exceeded",
+    "ResponseStructure": "{\"error\": {\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}}"
+}
+```
+
+**Supported Placeholders:**
+
+- `$(ErrorMessage)` - Replaced with the configured error message
+- `$(HttpStatusCode)` - Replaced with the HTTP status code number
+
+**Default Response (when ResponseStructure is not set):**
+
+```json
+{
+  "Message": "Rate limit Exceeded",
+  "Code": 429
+}
+```
+
+**Custom Response Example:**
+
+With the configuration above, when rate limiting is triggered, the response will be:
+
+```json
+{
+  "error": {
+    "message": "Rate limit Exceeded",
+    "code": 429
+  }
+}
+```
+
+**More Examples:**
+
+Simple flat structure:
+```json
+"ResponseStructure": "{\"message\": \"$(ErrorMessage)\", \"statusCode\": $(HttpStatusCode)}"
+```
+
+Nested structure with additional fields:
+```json
+"ResponseStructure": "{\"success\": false, \"error\": {\"type\": \"RateLimitError\", \"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}}"
+```
+
+The feature is fully backward compatible - existing applications will continue to work without any changes.
