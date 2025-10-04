@@ -1,5 +1,6 @@
 using DotNet.RateLimiter.Models;
 using Newtonsoft.Json;
+using System;
 using System.Net;
 
 namespace DotNet.RateLimiter.Utilities
