@@ -21,8 +21,8 @@ namespace DotNet.RateLimiter.Models
 
         /// <summary>
         /// custom JSON response structure for rate limit exceeded response.
-        /// Supports placeholders: $(ErrorMessage), $(HttpStatusCode), $(Status).
-        /// If not set, uses default response structure with Message, Code, and Status properties.
+        /// Supports placeholders: $(ErrorMessage), $(HttpStatusCode).
+        /// If not set, uses default response structure with Message and Code properties.
         /// Example: "{\"error\": {\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}}"
         /// </summary>
         public string ResponseStructure { get; set; }

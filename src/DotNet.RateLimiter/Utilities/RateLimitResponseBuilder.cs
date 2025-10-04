@@ -31,8 +31,7 @@ namespace DotNet.RateLimiter.Utilities
             // Replace placeholders with actual values
             var response = options.ResponseStructure
                 .Replace("$(ErrorMessage)", options.ErrorMessage)
-                .Replace("$(HttpStatusCode)", options.HttpStatusCode.ToString())
-                .Replace("$(Status)", ((HttpStatusCode)options.HttpStatusCode).ToString());
+                .Replace("$(HttpStatusCode)", options.HttpStatusCode.ToString());
 
             return response;
         }

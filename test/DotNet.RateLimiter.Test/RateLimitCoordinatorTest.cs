@@ -1,5 +1,5 @@
 ﻿using DotNet.RateLimiter.Interfaces;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ public class RateLimitCoordinatorTest
             PeriodInSec = periodInSec
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Theory]
@@ -62,7 +62,7 @@ public class RateLimitCoordinatorTest
             PeriodInSec = periodInSec
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Theory]
@@ -82,7 +82,7 @@ public class RateLimitCoordinatorTest
             RouteParams = string.Join(',', routeParams.Select(x=>x.Key))
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Theory]
@@ -109,7 +109,7 @@ public class RateLimitCoordinatorTest
             RouteParams = string.Join(',', routeParams.Select(x => x.Key))
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Theory]
@@ -131,7 +131,7 @@ public class RateLimitCoordinatorTest
             QueryParams = string.Join(',', queryParams.Select(x=>x.Key))
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Theory]
@@ -161,6 +161,6 @@ public class RateLimitCoordinatorTest
             QueryParams = string.Join(',', queryParams.Select(x => x.Key))
         });
 
-        result.Should().Be(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 }

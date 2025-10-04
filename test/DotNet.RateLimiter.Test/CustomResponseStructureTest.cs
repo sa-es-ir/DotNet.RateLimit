@@ -3,11 +3,11 @@ using System.Net;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.Models;
 using DotNet.RateLimiter.Utilities;
-using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Shouldly;
 using Xunit;
 
 namespace DotNet.RateLimiter.Test;
@@ -35,10 +35,9 @@ public class CustomResponseStructureTest
 
         // Verify default response structure
         var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
-        response.Should().NotBeNull();
-        response!.Code.Should().Be(429);
-        response.Message.Should().Be("Rate limit Exceeded");
-        response.Status.Should().Be("TooManyRequests");
+        response.ShouldNotBeNull();
+        response.Code.ShouldBe(429);
+        response.Message.ShouldBe("Rate limit Exceeded");
     }
 
     [Fact]
@@ -48,18 +47,17 @@ public class CustomResponseStructureTest
         {
             HttpStatusCode = 429,
             ErrorMessage = "Rate limit Exceeded",
-            ResponseStructure = "{\"error\": {\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode), \"status\": \"$(Status)\"}}"
+            ResponseStructure = "{\"error\": {\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}}"
         };
 
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify custom response structure
         var response = JObject.Parse(responseBody);
-        response.Should().NotBeNull();
-        response["error"].Should().NotBeNull();
-        response["error"]!["message"]!.Value<string>().Should().Be("Rate limit Exceeded");
-        response["error"]!["code"]!.Value<int>().Should().Be(429);
-        response["error"]!["status"]!.Value<string>().Should().Be("TooManyRequests");
+        response.ShouldNotBeNull();
+        response["error"].ShouldNotBeNull();
+        response["error"]!["message"]!.Value<string>().ShouldBe("Rate limit Exceeded");
+        response["error"]!["code"]!.Value<int>().ShouldBe(429);
     }
 
     [Fact]
@@ -76,10 +74,10 @@ public class CustomResponseStructureTest
 
         // Verify custom response structure
         var response = JObject.Parse(responseBody);
-        response.Should().NotBeNull();
-        response["data"].Should().NotBeNull();
-        response["data"]!["message"]!.Value<string>().Should().Be("Too many requests");
-        response["data"]!["code"]!.Value<int>().Should().Be(429);
+        response.ShouldNotBeNull();
+        response["data"].ShouldNotBeNull();
+        response["data"]!["message"]!.Value<string>().ShouldBe("Too many requests");
+        response["data"]!["code"]!.Value<int>().ShouldBe(429);
     }
 
     [Fact]
@@ -89,42 +87,40 @@ public class CustomResponseStructureTest
         {
             HttpStatusCode = 429,
             ErrorMessage = "Request rate limit exceeded",
-            ResponseStructure = "{\"success\": false, \"error\": {\"type\": \"RateLimitError\", \"message\": \"$(ErrorMessage)\", \"httpStatus\": $(HttpStatusCode), \"statusText\": \"$(Status)\"}}"
+            ResponseStructure = "{\"success\": false, \"error\": {\"type\": \"RateLimitError\", \"message\": \"$(ErrorMessage)\", \"httpStatus\": $(HttpStatusCode)}}"
         };
 
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify complex custom response structure
         var response = JObject.Parse(responseBody);
-        response.Should().NotBeNull();
-        response["success"]!.Value<bool>().Should().BeFalse();
-        response["error"].Should().NotBeNull();
-        response["error"]!["type"]!.Value<string>().Should().Be("RateLimitError");
-        response["error"]!["message"]!.Value<string>().Should().Be("Request rate limit exceeded");
-        response["error"]!["httpStatus"]!.Value<int>().Should().Be(429);
-        response["error"]!["statusText"]!.Value<string>().Should().Be("TooManyRequests");
+        response.ShouldNotBeNull();
+        response["success"]!.Value<bool>().ShouldBe(false);
+        response["error"].ShouldNotBeNull();
+        response["error"]!["type"]!.Value<string>().ShouldBe("RateLimitError");
+        response["error"]!["message"]!.Value<string>().ShouldBe("Request rate limit exceeded");
+        response["error"]!["httpStatus"]!.Value<int>().ShouldBe(429);
     }
 
     [Theory]
-    [InlineData(429, "TooManyRequests")]
-    [InlineData(503, "ServiceUnavailable")]
-    [InlineData(500, "InternalServerError")]
-    public void ResponseBuilder_WithCustomStatusCode_ReturnsCorrectStatus(int statusCode, string expectedStatus)
+    [InlineData(429)]
+    [InlineData(503)]
+    [InlineData(500)]
+    public void ResponseBuilder_WithCustomStatusCode_ReturnsCorrectStatus(int statusCode)
     {
         var options = new RateLimitOptions
         {
             HttpStatusCode = statusCode,
             ErrorMessage = "Rate limit exceeded",
-            ResponseStructure = "{\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode), \"status\": \"$(Status)\"}"
+            ResponseStructure = "{\"message\": \"$(ErrorMessage)\", \"code\": $(HttpStatusCode)}"
         };
 
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify custom response structure with correct status
         var response = JObject.Parse(responseBody);
-        response.Should().NotBeNull();
-        response["code"]!.Value<int>().Should().Be(statusCode);
-        response["status"]!.Value<string>().Should().Be(expectedStatus);
+        response.ShouldNotBeNull();
+        response["code"]!.Value<int>().ShouldBe(statusCode);
     }
 
     [Fact]
@@ -141,9 +137,9 @@ public class CustomResponseStructureTest
 
         // Verify default response structure is used
         var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
-        response.Should().NotBeNull();
-        response!.Code.Should().Be(429);
-        response.Message.Should().Be("Rate limit Exceeded");
+        response.ShouldNotBeNull();
+        response.Code.ShouldBe(429);
+        response.Message.ShouldBe("Rate limit Exceeded");
     }
 
     [Fact]
@@ -160,9 +156,9 @@ public class CustomResponseStructureTest
 
         // Verify default response structure is used
         var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
-        response.Should().NotBeNull();
-        response!.Code.Should().Be(429);
-        response.Message.Should().Be("Rate limit Exceeded");
+        response.ShouldNotBeNull();
+        response.Code.ShouldBe(429);
+        response.Message.ShouldBe("Rate limit Exceeded");
     }
 
     [Fact]
@@ -176,11 +172,11 @@ public class CustomResponseStructureTest
 
         // First request should pass
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)HttpStatusCode.OK);
 
         // Second request should be rate limited
         await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
-        actionExecutingContext.HttpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.TooManyRequests);
-        actionExecutingContext.HttpContext.Response.ContentType.Should().Be("application/json");
+        actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)HttpStatusCode.TooManyRequests);
+        actionExecutingContext.HttpContext.Response.ContentType.ShouldBe("application/json");
     }
 }

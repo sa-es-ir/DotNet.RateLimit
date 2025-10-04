@@ -7,7 +7,5 @@ namespace DotNet.RateLimiter.Models
         public string Message { get; set; }
 
         public int Code { get; set; }
-
-        public string Status => ((HttpStatusCode)Code).ToString();
     }
 }
