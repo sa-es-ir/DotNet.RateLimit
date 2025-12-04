@@ -45,7 +45,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="AsyncKeyedLock" Version="7.1.4" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.22" />
 	</ItemGroup>
 

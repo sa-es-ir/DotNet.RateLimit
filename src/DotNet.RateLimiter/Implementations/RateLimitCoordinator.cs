@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations;
@@ -23,7 +22,8 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     private readonly IOptions<RateLimitOptions> _options;
     private static readonly char[] _separator = [','];
 
-    public RateLimitCoordinator(ILogger<RateLimitCoordinator> logger,
+    public RateLimitCoordinator(
+        ILogger<RateLimitCoordinator> logger,
         IRateLimitService rateLimitService,
         IOptions<RateLimitOptions> options)
     {
@@ -31,7 +31,6 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         _rateLimitService = rateLimitService;
         _options = options;
     }
-
 
     public async Task<bool> CheckRateLimitAsync(ActionExecutingContext context, RateLimitParams ratelimitParams)
     {
@@ -188,20 +187,35 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
     private static void SetBodyParamsRateLimitKey(ActionExecutingContext context, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
     {
-        if (!string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
+        if (string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
+            return;
+
+        var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
+
+        var json = JsonSerializer.Serialize(context.ActionArguments);
+
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        if (root.ValueKind != JsonValueKind.Object)
+            return;
+
+        using var enumerator = root.EnumerateObject().GetEnumerator();
+        if (!enumerator.MoveNext())
+            return;
+
+        var firstArg = enumerator.Current.Value;
+        if (firstArg.ValueKind != JsonValueKind.Object)
+            return;
+
+        foreach (var parameter in parameters)
         {
-            var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
-            var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
-            var obj = JObject.Parse(jsonSerializer);
-
-            foreach (var parameter in parameters)
+            foreach (var property in firstArg.EnumerateObject())
             {
-                var rootProperty = obj.Root.First().Values().FirstOrDefault(x => x.Type == JTokenType.Property
-                         && string.Equals(((JProperty)x).Name, parameter, StringComparison.OrdinalIgnoreCase));
-
-                if (rootProperty is JProperty property)
+                if (string.Equals(property.Name, parameter, StringComparison.OrdinalIgnoreCase))
                 {
-                    rateLimitKey.Append(property.Value).Append(':');
+                    rateLimitKey.Append(property.Value.ToString()).Append(':');
+                    break;
                 }
             }
         }

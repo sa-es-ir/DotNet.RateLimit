@@ -3,8 +3,9 @@ using DotNet.RateLimiter.Models;
 using DotNet.RateLimiter.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.EndPointFilters;
@@ -15,14 +16,17 @@ public class RateLimitEndPointFilter : IEndpointFilter
     private readonly IOptions<RateLimitOptions> _options;
     private readonly IRateLimitCoordinator _rateLimitCoordinator;
 
-    public RateLimitEndPointFilter(IOptions<RateLimitOptions> options,
+    public RateLimitEndPointFilter(
+        IOptions<RateLimitOptions> options,
         IRateLimitCoordinator rateLimitCoordinator)
     {
         _options = options;
         _rateLimitCoordinator = rateLimitCoordinator;
     }
 
-    public async ValueTask<object> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    public async ValueTask<object> InvokeAsync(
+        EndpointFilterInvocationContext context,
+        EndpointFilterDelegate next)
     {
         var rateLimitParams = context.HttpContext.Features.Get<RateLimitEndPointParams>();
 
@@ -35,15 +39,16 @@ public class RateLimitEndPointFilter : IEndpointFilter
 
         if (goodToGo)
             return await next(context);
-        else
-        {
-            var responseBody = RateLimitResponseBuilder.BuildResponse(_options.Value);
-            
-            // Parse the JSON string to an object for Results.Json
-            var responseObject = JToken.Parse(responseBody);
-            
-            return Results.Json(responseObject, contentType: "application/json", statusCode: _options.Value.HttpStatusCode);
-        }
+
+        var responseBody = RateLimitResponseBuilder.BuildResponse(_options.Value);
+
+        // Parse the JSON string to a JSON node for Results.Json
+        JsonNode responseObject = JsonNode.Parse(responseBody);
+
+        return Results.Json(
+            responseObject,
+            contentType: "application/json",
+            statusCode: _options.Value.HttpStatusCode);
     }
 }
 #endif
