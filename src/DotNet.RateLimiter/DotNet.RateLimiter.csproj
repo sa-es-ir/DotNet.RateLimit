@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+I﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net9.0</TargetFrameworks>
 		<AssemblyName>DotNet.RateLimiter</AssemblyName>
@@ -44,7 +44,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AsyncKeyedLock" Version="7.1.4" />
+		<PackageReference Include="AsyncKeyedLock" Version="7.1.8" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.22" />
 	</ItemGroup>
 
