@@ -62,7 +62,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (ratelimitParams.Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
 
-            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
+            ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
 
             SetBodyParamsRateLimitKey(context, ratelimitParams, rateLimitKey);
 
@@ -136,7 +136,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 .Append(context.HttpContext.Request.Method)
                 .Append(context.HttpContext.GetEndpoint()?.DisplayName);
 
-            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
+            ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
 
             return await _rateLimitService.HasAccessAsync(rateLimitKey.ToString(), ratelimitParams.PeriodInSec, ratelimitParams.Limit);
         }
@@ -208,15 +208,18 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         if (firstArg.ValueKind != JsonValueKind.Object)
             return;
 
+        var properties = firstArg.EnumerateObject()
+            .ToDictionary(p => p.Name, p => p.Value, StringComparer.OrdinalIgnoreCase);
+
         foreach (var parameter in parameters)
         {
-            foreach (var property in firstArg.EnumerateObject())
+            if (properties.TryGetValue(parameter, out var value))
             {
-                if (string.Equals(property.Name, parameter, StringComparison.OrdinalIgnoreCase))
-                {
-                    rateLimitKey.Append(property.Value.ToString()).Append(':');
-                    break;
-                }
+                rateLimitKey.Append(
+                    (value.ValueKind == JsonValueKind.String)
+                        ? value.GetString()
+                        : value.GetRawText()
+                    ).Append(':');
             }
         }
     }
