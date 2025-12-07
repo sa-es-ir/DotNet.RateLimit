@@ -4,7 +4,6 @@ using DotNet.RateLimiter.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.ActionFilters
