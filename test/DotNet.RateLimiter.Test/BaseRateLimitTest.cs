@@ -139,7 +139,7 @@ public class BaseRateLimitTest
             string.Join(",", actionArguments.Select(x => x.Key)),
             string.Join(",", queryParams.Select(x => x.Key)));
 
-        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), routeParams: actionArguments, queryParams: queryParams);
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), routeParams: actionArguments, queryParams: queryParams!);
 
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
 
@@ -155,7 +155,7 @@ public class BaseRateLimitTest
         using var scope = _scopeFactory.CreateScope();
         var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit, periodInSec, routeParams: string.Join(",", actionArguments.Select(x => x.Key)));
 
-        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), routeParams: actionArguments, queryParams: queryParams);
+        var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress(), routeParams: actionArguments, queryParams: queryParams!);
 
         var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), actionArguments, null!);
 

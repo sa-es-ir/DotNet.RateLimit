@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations;
@@ -23,7 +22,8 @@ public class RateLimitCoordinator : IRateLimitCoordinator
     private readonly IOptions<RateLimitOptions> _options;
     private static readonly char[] _separator = [','];
 
-    public RateLimitCoordinator(ILogger<RateLimitCoordinator> logger,
+    public RateLimitCoordinator(
+        ILogger<RateLimitCoordinator> logger,
         IRateLimitService rateLimitService,
         IOptions<RateLimitOptions> options)
     {
@@ -31,7 +31,6 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         _rateLimitService = rateLimitService;
         _options = options;
     }
-
 
     public async Task<bool> CheckRateLimitAsync(ActionExecutingContext context, RateLimitParams ratelimitParams)
     {
@@ -63,7 +62,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (ratelimitParams.Scope == RateLimitScope.Action)
                 rateLimitKey.Append(action);
 
-            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
+            ProvideRateLimitKey(context.HttpContext, ratelimitParams, rateLimitKey);
 
             SetBodyParamsRateLimitKey(context, ratelimitParams, rateLimitKey);
 
@@ -137,7 +136,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                 .Append(context.HttpContext.Request.Method)
                 .Append(context.HttpContext.GetEndpoint()?.DisplayName);
 
-            RateLimitCoordinator.ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
+            ProvideRateLimitKey(context.HttpContext, rateLimitParams, rateLimitKey);
 
             return await _rateLimitService.HasAccessAsync(rateLimitKey.ToString(), ratelimitParams.PeriodInSec, ratelimitParams.Limit);
         }
@@ -188,21 +187,39 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
     private static void SetBodyParamsRateLimitKey(ActionExecutingContext context, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)
     {
-        if (!string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
+        if (string.IsNullOrWhiteSpace(ratelimitParams.BodyParams))
+            return;
+
+        var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
+
+        var json = JsonSerializer.Serialize(context.ActionArguments);
+
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        if (root.ValueKind != JsonValueKind.Object)
+            return;
+
+        using var enumerator = root.EnumerateObject().GetEnumerator();
+        if (!enumerator.MoveNext())
+            return;
+
+        var firstArg = enumerator.Current.Value;
+        if (firstArg.ValueKind != JsonValueKind.Object)
+            return;
+
+        var properties = firstArg.EnumerateObject()
+            .ToDictionary(p => p.Name, p => p.Value, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var parameter in parameters)
         {
-            var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
-            var jsonSerializer = JsonConvert.SerializeObject(context.ActionArguments);
-            var obj = JObject.Parse(jsonSerializer);
-
-            foreach (var parameter in parameters)
+            if (properties.TryGetValue(parameter, out var value))
             {
-                var rootProperty = obj.Root.First().Values().FirstOrDefault(x => x.Type == JTokenType.Property
-                         && string.Equals(((JProperty)x).Name, parameter, StringComparison.OrdinalIgnoreCase));
-
-                if (rootProperty is JProperty property)
-                {
-                    rateLimitKey.Append(property.Value).Append(':');
-                }
+                rateLimitKey.Append(
+                    (value.ValueKind == JsonValueKind.String)
+                        ? value.GetString()
+                        : value.GetRawText()
+                    ).Append(':');
             }
         }
     }

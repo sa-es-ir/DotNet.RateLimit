@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DotNet.RateLimiter.Models;
 using DotNet.RateLimiter.Utilities;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
 
@@ -34,7 +33,7 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify default response structure
-        var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
+        var response = JsonSerializer.Deserialize<RateLimitResponse>(responseBody);
         response.ShouldNotBeNull();
         response.Code.ShouldBe(429);
         response.Message.ShouldBe("Rate limit Exceeded");
@@ -53,11 +52,17 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify custom response structure
-        var response = JObject.Parse(responseBody);
-        response.ShouldNotBeNull();
-        response["error"].ShouldNotBeNull();
-        response["error"]!["message"]!.Value<string>().ShouldBe("Rate limit Exceeded");
-        response["error"]!["code"]!.Value<int>().ShouldBe(429);
+        using var doc = JsonDocument.Parse(responseBody);
+        var root = doc.RootElement;
+
+        root.ValueKind.ShouldBe(JsonValueKind.Object);
+        root.TryGetProperty("error", out var error).ShouldBeTrue();
+
+        error.TryGetProperty("message", out var messageProp).ShouldBeTrue();
+        messageProp.GetString().ShouldBe("Rate limit Exceeded");
+
+        error.TryGetProperty("code", out var codeProp).ShouldBeTrue();
+        codeProp.GetInt32().ShouldBe(429);
     }
 
     [Fact]
@@ -73,11 +78,17 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify custom response structure
-        var response = JObject.Parse(responseBody);
-        response.ShouldNotBeNull();
-        response["data"].ShouldNotBeNull();
-        response["data"]!["message"]!.Value<string>().ShouldBe("Too many requests");
-        response["data"]!["code"]!.Value<int>().ShouldBe(429);
+        using var doc = JsonDocument.Parse(responseBody);
+        var root = doc.RootElement;
+
+        root.ValueKind.ShouldBe(JsonValueKind.Object);
+        root.TryGetProperty("data", out var data).ShouldBeTrue();
+
+        data.TryGetProperty("message", out var messageProp).ShouldBeTrue();
+        messageProp.GetString().ShouldBe("Too many requests");
+
+        data.TryGetProperty("code", out var codeProp).ShouldBeTrue();
+        codeProp.GetInt32().ShouldBe(429);
     }
 
     [Fact]
@@ -93,13 +104,24 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify complex custom response structure
-        var response = JObject.Parse(responseBody);
-        response.ShouldNotBeNull();
-        response["success"]!.Value<bool>().ShouldBe(false);
-        response["error"].ShouldNotBeNull();
-        response["error"]!["type"]!.Value<string>().ShouldBe("RateLimitError");
-        response["error"]!["message"]!.Value<string>().ShouldBe("Request rate limit exceeded");
-        response["error"]!["httpStatus"]!.Value<int>().ShouldBe(429);
+        using var doc = JsonDocument.Parse(responseBody);
+        var root = doc.RootElement;
+
+        root.ValueKind.ShouldBe(JsonValueKind.Object);
+
+        root.TryGetProperty("success", out var successProp).ShouldBeTrue();
+        successProp.GetBoolean().ShouldBeFalse();
+
+        root.TryGetProperty("error", out var error).ShouldBeTrue();
+
+        error.TryGetProperty("type", out var typeProp).ShouldBeTrue();
+        typeProp.GetString().ShouldBe("RateLimitError");
+
+        error.TryGetProperty("message", out var messageProp).ShouldBeTrue();
+        messageProp.GetString().ShouldBe("Request rate limit exceeded");
+
+        error.TryGetProperty("httpStatus", out var statusProp).ShouldBeTrue();
+        statusProp.GetInt32().ShouldBe(429);
     }
 
     [Theory]
@@ -118,9 +140,12 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify custom response structure with correct status
-        var response = JObject.Parse(responseBody);
-        response.ShouldNotBeNull();
-        response["code"]!.Value<int>().ShouldBe(statusCode);
+        using var doc = JsonDocument.Parse(responseBody);
+        var root = doc.RootElement;
+
+        root.ValueKind.ShouldBe(JsonValueKind.Object);
+        root.TryGetProperty("code", out var codeProp).ShouldBeTrue();
+        codeProp.GetInt32().ShouldBe(statusCode);
     }
 
     [Fact]
@@ -136,7 +161,7 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify default response structure is used
-        var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
+        var response = JsonSerializer.Deserialize<RateLimitResponse>(responseBody);
         response.ShouldNotBeNull();
         response.Code.ShouldBe(429);
         response.Message.ShouldBe("Rate limit Exceeded");
@@ -155,7 +180,7 @@ public class CustomResponseStructureTest
         var responseBody = RateLimitResponseBuilder.BuildResponse(options);
 
         // Verify default response structure is used
-        var response = JsonConvert.DeserializeObject<RateLimitResponse>(responseBody);
+        var response = JsonSerializer.Deserialize<RateLimitResponse>(responseBody);
         response.ShouldNotBeNull();
         response.Code.ShouldBe(429);
         response.Message.ShouldBe("Rate limit Exceeded");
@@ -168,14 +193,22 @@ public class CustomResponseStructureTest
         var rateLimitAction = TestInitializer.CreateRateLimitFilter(scope, limit: 1, periodInSec: 60);
 
         var actionContext = TestInitializer.SetupActionContext(ip: TestInitializer.GetRandomIpAddress());
-        var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), null!);
+        var actionExecutingContext = new ActionExecutingContext(
+            actionContext,
+            new List<IFilterMetadata>(),
+            new Dictionary<string, object?>(),
+            null!);
 
         // First request should pass
-        await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
+        await rateLimitAction.OnActionExecutionAsync(
+            actionExecutingContext,
+            () => TestInitializer.ActionExecutionDelegateNext(actionContext));
         actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)HttpStatusCode.OK);
 
         // Second request should be rate limited
-        await rateLimitAction.OnActionExecutionAsync(actionExecutingContext, () => TestInitializer.ActionExecutionDelegateNext(actionContext));
+        await rateLimitAction.OnActionExecutionAsync(
+            actionExecutingContext,
+            () => TestInitializer.ActionExecutionDelegateNext(actionContext));
         actionExecutingContext.HttpContext.Response.StatusCode.ShouldBe((int)HttpStatusCode.TooManyRequests);
         actionExecutingContext.HttpContext.Response.ContentType.ShouldBe("application/json");
     }
