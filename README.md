@@ -15,9 +15,9 @@ for a specific Action, Controller, or minimal endpoint. The idea behind this sol
 because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0)
 affects all requests, but with filters, you can limit some of the critical endpoints.
 
-Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection it will use Redis, it is
+Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection, it will use Redis. It is
 recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP
-address but you can set ClientId in request headers and the header name is configurable.
+address, but you can set ClientId in the request headers, and the header name is configurable.
 
 ## How to add in DI
 
@@ -57,7 +57,7 @@ builder.Services.AddRateLimitService(builder.Configuration, database);
 
 ## How to use
 
-You can see the **Demo** project to know how to use it in all scenarios and also you can follow this article in [*
+You can see the **Demo** project to know how to use it in all scenarios, and also you can follow this article in [*
 *Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
 
 ### Simple usage
