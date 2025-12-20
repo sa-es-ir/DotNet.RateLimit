@@ -19,8 +19,6 @@ Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** co
 recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP
 address but you can set ClientId in request headers and the header name is configurable.
 
-## Thank you for giving a ⭐ to this repo!
-
 ## How to add in DI
 
 You can add RateLimit in Startup like this:
