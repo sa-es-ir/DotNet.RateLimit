@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
 		<AssemblyName>DotNet.RateLimiter</AssemblyName>
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
-		<Version>3.0.1</Version>
+		<Version>4.0.0</Version>
 		<LangVersion>preview</LangVersion>
 		<Authors>Saeed Esmaeelinejad</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageId>DotNetRateLimiter</PackageId>
 		<PackageTags>aspnetcore;rate-limit;action-filters,minimal-api</PackageTags>
 		<PackageLicense>http://opensource.org/licenses/MIT</PackageLicense>
@@ -23,15 +24,20 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1' Or $(TargetFramework) == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$(TargetFramework) == 'net10.0'">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+	</ItemGroup>
+
 	<ItemGroup Condition="$(TargetFramework) == 'net9.0'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.11" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework) == 'net8.0'">
@@ -39,7 +45,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net9.0'">
+	<ItemGroup Condition="$(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net9.0' Or $(TargetFramework) == 'net10.0'">
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 

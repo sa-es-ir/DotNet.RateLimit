@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>DotNet.RateLimiter.Demo</AssemblyName>
 		<RootNamespace>DotNet.RateLimiter.Demo</RootNamespace>
 		<Nullable>disable</Nullable>
@@ -9,12 +9,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="DotNetRateLimiter" Version="3.0.1" />-->
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="DotNetRateLimiter" Version="4.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<ProjectReference Include="..\..\src\DotNet.RateLimiter\DotNet.RateLimiter.csproj" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 </Project>
