@@ -16,8 +16,8 @@ because the [Middlewares](https://docs.microsoft.com/en-us/aspnet/core/fundament
 affects all requests, but with filters, you can limit some of the critical endpoints.
 
 Rate Limit uses **In-Memory** cache by default, but if you set up a **Redis** connection, it will use Redis. It is
-recommended to use Redis for checking the rate limit in the distributed applications. By default, it limits the IP
-address, but you can set ClientId in the request headers, and the header name is configurable.
+recommended to use Redis for checking the rate limit in distributed applications. By default, it limits the IP
+address, but you can set an identifier (default name is ClientId) in the request headers, and the header name is configurable.
 
 ## How to add in DI
 
