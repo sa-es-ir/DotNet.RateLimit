@@ -221,8 +221,8 @@ You can customize the JSON response structure when rate limiting is triggered by
 
 ```json
 {
-  "Message": "Rate limit Exceeded",
-  "Code": 429
+  "message": "Rate limit Exceeded",
+  "code": 429
 }
 ```
 
