@@ -33,8 +33,7 @@ builder.Services.AddRateLimitService(builder.Configuration);
 
 ## How to use
 
-You can see the **Demo** project to know how to use it in all scenarios, and also you can follow this article in [*
-*Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
+You can see the **Demo** project to know how to use it in all scenarios, and also you can follow this article in [**Medium**](https://medium.com/@s.esmaeelinejad/net-6-ratelimit-with-actionfilters-918a1aacb5fa).
 
 ### Simple usage
 
