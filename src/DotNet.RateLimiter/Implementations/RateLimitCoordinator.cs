@@ -167,17 +167,19 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             {
                 if (httpContext.Request.Query.TryGetValue(parameter, out var queryParams))
                 {
-                    var items = queryParams.ToArray();
-
-                    switch (items.Length)
+                    switch (queryParams.Count)
                     {
                         case 0:
                             continue;
                         case 1:
-                            rateLimitKey.Append(items[0]).Append(':');
+                            rateLimitKey.Append(queryParams[0]).Append(':');
                             break;
                         default:
-                            rateLimitKey.Append(string.Join(":", items));
+                            rateLimitKey.Append(queryParams[0]);
+                            for (int i = 1; i < queryParams.Count; i++)
+                            {
+                                rateLimitKey.Append(':').Append(queryParams[i]);
+                            }
                             break;
                     }
                 }
@@ -192,9 +194,12 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
         var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
 
-        var json = JsonSerializer.Serialize(context.ActionArguments);
+        if (context.ActionArguments is null || context.ActionArguments.Count == 0)
+            return;
 
-        using var document = JsonDocument.Parse(json);
+        byte[] utf8Json = JsonSerializer.SerializeToUtf8Bytes(context.ActionArguments);
+
+        using var document = JsonDocument.Parse(utf8Json);
         var root = document.RootElement;
 
         if (root.ValueKind != JsonValueKind.Object)
@@ -216,10 +221,11 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (properties.TryGetValue(parameter, out var value))
             {
                 rateLimitKey.Append(
-                    (value.ValueKind == JsonValueKind.String)
+                    value.ValueKind == JsonValueKind.String
                         ? value.GetString()
-                        : value.GetRawText()
-                    ).Append(':');
+                        : value.GetRawText());
+
+                rateLimitKey.Append(':');
             }
         }
     }
