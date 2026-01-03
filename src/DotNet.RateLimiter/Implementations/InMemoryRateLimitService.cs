@@ -48,6 +48,7 @@ namespace DotNet.RateLimiter.Implementations
 
             _memoryCache.Set(resourceKey, new InMemoryRateLimitEntry
             {
+                Total = 0,
                 Expiration = now + period
             }, period);
 
