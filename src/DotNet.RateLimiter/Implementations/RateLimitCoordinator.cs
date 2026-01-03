@@ -197,9 +197,7 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         if (context.ActionArguments is null || context.ActionArguments.Count == 0)
             return;
 
-        byte[] utf8Json = JsonSerializer.SerializeToUtf8Bytes(context.ActionArguments);
-
-        using var document = JsonDocument.Parse(utf8Json);
+        using var document = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(context.ActionArguments));
         var root = document.RootElement;
 
         if (root.ValueKind != JsonValueKind.Object)
