@@ -165,11 +165,9 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             var parameters = ratelimitParams.QueryParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
-                if (httpContext.Request.Query.TryGetValue(parameter, out var queryParams))
+                if (httpContext.Request.Query.TryGetValue(parameter, out var items))
                 {
-                    var items = queryParams.ToArray();
-
-                    switch (items.Length)
+                    switch (items.Count)
                     {
                         case 0:
                             continue;
@@ -177,7 +175,11 @@ public class RateLimitCoordinator : IRateLimitCoordinator
                             rateLimitKey.Append(items[0]).Append(':');
                             break;
                         default:
-                            rateLimitKey.Append(string.Join(":", items));
+                            rateLimitKey.Append(items[0]);
+                            for (int i = 1; i < items.Count; i++)
+                            {
+                                rateLimitKey.Append(':').Append(items[i]);
+                            }
                             break;
                     }
                 }
@@ -192,9 +194,10 @@ public class RateLimitCoordinator : IRateLimitCoordinator
 
         var parameters = ratelimitParams.BodyParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
 
-        var json = JsonSerializer.Serialize(context.ActionArguments);
+        if (context.ActionArguments is null || context.ActionArguments.Count == 0)
+            return;
 
-        using var document = JsonDocument.Parse(json);
+        using var document = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(context.ActionArguments));
         var root = document.RootElement;
 
         if (root.ValueKind != JsonValueKind.Object)
