@@ -165,20 +165,20 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             var parameters = ratelimitParams.QueryParams.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
             foreach (var parameter in parameters)
             {
-                if (httpContext.Request.Query.TryGetValue(parameter, out var queryParams))
+                if (httpContext.Request.Query.TryGetValue(parameter, out var items))
                 {
-                    switch (queryParams.Count)
+                    switch (items.Count)
                     {
                         case 0:
                             continue;
                         case 1:
-                            rateLimitKey.Append(queryParams[0]).Append(':');
+                            rateLimitKey.Append(items[0]).Append(':');
                             break;
                         default:
-                            rateLimitKey.Append(queryParams[0]);
-                            for (int i = 1; i < queryParams.Count; i++)
+                            rateLimitKey.Append(items[0]);
+                            for (int i = 1; i < items.Count; i++)
                             {
-                                rateLimitKey.Append(':').Append(queryParams[i]);
+                                rateLimitKey.Append(':').Append(items[i]);
                             }
                             break;
                     }
@@ -221,11 +221,10 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (properties.TryGetValue(parameter, out var value))
             {
                 rateLimitKey.Append(
-                    value.ValueKind == JsonValueKind.String
+                    (value.ValueKind == JsonValueKind.String)
                         ? value.GetString()
-                        : value.GetRawText());
-
-                rateLimitKey.Append(':');
+                        : value.GetRawText()
+                    ).Append(':');
             }
         }
     }
