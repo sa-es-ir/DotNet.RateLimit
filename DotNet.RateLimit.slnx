@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/demo/">
+    <Project Path="demo/DotNet.RateLimiter.Demo/DotNet.RateLimiter.Demo.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/DotNet.RateLimiter/DotNet.RateLimiter.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/DotNet.RateLimiter.Test/DotNet.RateLimiter.Test.csproj" />
+  </Folder>
+</Solution>
