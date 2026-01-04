@@ -14,7 +14,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  solution: '**/*.sln'
+  solution: '**/*.slnx'
   buildConfiguration: 'Release'
 
 steps:
