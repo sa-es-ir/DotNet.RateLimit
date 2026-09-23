@@ -4,6 +4,7 @@ using DotNet.RateLimiter.Interfaces;
 using DotNet.RateLimiter.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,6 +12,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DotNet.RateLimiter.Implementations;
@@ -197,21 +199,24 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         if (context.ActionArguments is null || context.ActionArguments.Count == 0)
             return;
 
-        using var document = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(context.ActionArguments));
+        //serialize only the body model, other arguments (e.g. CancellationToken) may not be serializable
+        var bodyParameterName = context.ActionDescriptor.Parameters?
+            .FirstOrDefault(p => p.BindingInfo?.BindingSource == BindingSource.Body)?.Name;
+
+        var bodyModel = bodyParameterName != null && context.ActionArguments.TryGetValue(bodyParameterName, out var bodyArgument)
+            ? bodyArgument
+            : context.ActionArguments.Values.FirstOrDefault(v => v is not CancellationToken);
+
+        if (bodyModel is null)
+            return;
+
+        using var document = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(bodyModel, bodyModel.GetType()));
         var root = document.RootElement;
 
         if (root.ValueKind != JsonValueKind.Object)
             return;
 
-        using var enumerator = root.EnumerateObject().GetEnumerator();
-        if (!enumerator.MoveNext())
-            return;
-
-        var firstArg = enumerator.Current.Value;
-        if (firstArg.ValueKind != JsonValueKind.Object)
-            return;
-
-        var properties = firstArg.EnumerateObject()
+        var properties = root.EnumerateObject()
             .ToDictionary(p => p.Name, p => p.Value, StringComparer.OrdinalIgnoreCase);
 
         foreach (var parameter in parameters)
