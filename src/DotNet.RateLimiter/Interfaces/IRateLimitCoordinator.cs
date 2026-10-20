@@ -9,6 +9,8 @@ namespace DotNet.RateLimiter.Interfaces
     {
         Task<bool> CheckRateLimitAsync(ActionExecutingContext context, RateLimitParams ratelimitParams);
 
+        Task<bool> CheckRateLimitAsync(FunctionRateLimitContext context, RateLimitEndPointParams ratelimitParams);
+
 #if NET7_0_OR_GREATER
         Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams);
 #endif
