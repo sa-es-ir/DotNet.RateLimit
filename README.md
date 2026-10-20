@@ -157,6 +157,42 @@ public class RateLimitOnAllController : ControllerBase
     }
 }
 ```
+### Using with Azure Functions (isolated worker)
+
+Azure Functions **isolated worker** apps can use the same `[RateLimit]` attribute on `HttpTrigger` functions. Register the rate limit service and add `RateLimitFunctionMiddleware` in `Program.cs`:
+
+```csharp
+using DotNet.RateLimiter;
+using DotNet.RateLimiter.Functions;
+using Microsoft.Extensions.Hosting;
+
+var builder = new HostBuilder()
+    .ConfigureFunctionsWorkerDefaults(app =>
+    {
+        app.UseMiddleware<RateLimitFunctionMiddleware>();
+    })
+    .ConfigureServices((context, services) =>
+    {
+        services.AddRateLimitService(context.Configuration);
+    });
+
+using var host = builder.Build();
+host.Run();
+```
+
+Then put the attribute on the function method:
+
+```csharp
+[Function("WeatherForecast")]
+[RateLimit(PeriodInSec = 60, Limit = 3)]
+public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+{
+    ....
+}
+```
+
+> In the Functions path `BodyParams` and `Scope` are ignored (`PeriodInSec`, `Limit`, `RouteParams`, and `QueryParams` are honored). The client IP is read from the header configured by `IpHeaderName` (default `X-Forwarded-For`), because the isolated worker has no `HttpContext` connection. This middleware is for `ConfigureFunctionsWorkerDefaults`; with `ConfigureFunctionsWebApplication` (ASP.NET Core integration) it passes requests through.
+
 ### Using Existing Redis Connections
 
 If your application already has Redis infrastructure, you can reuse existing connections instead of creating new ones:
