@@ -147,6 +147,13 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             if (ShortCircuit)
                 return HasAccess;
 
+            //no connection address in the isolated worker, so without an IP or client id every caller would share one bucket
+            if (string.IsNullOrEmpty(RateLimitPrefixKey))
+            {
+                _logger.LogWarning("Rate limit skipped for {FunctionName}: no client IP in '{IpHeaderName}' header and no client identifier", context.FunctionName, _options.Value.IpHeaderName);
+                return true;
+            }
+
             var rateLimitKey = new StringBuilder();
             rateLimitKey
                 .Append(RateLimitPrefixKey)

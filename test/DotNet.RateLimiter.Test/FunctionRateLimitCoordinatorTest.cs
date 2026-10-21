@@ -113,6 +113,18 @@ public class FunctionRateLimitCoordinatorTest
         (await coordinator.CheckRateLimitAsync(context, parameters)).ShouldBeTrue();
     }
 
+    [Fact]
+    public async Task NoIpAndNoClientId_IsNotRateLimited()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var coordinator = scope.ServiceProvider.GetRequiredService<IRateLimitCoordinator>();
+        var context = CreateContext(userIp: null!);
+        var parameters = new RateLimitEndPointParams { Limit = 1, PeriodInSec = 60 };
+
+        (await coordinator.CheckRateLimitAsync(context, parameters)).ShouldBeTrue();
+        (await coordinator.CheckRateLimitAsync(context, parameters)).ShouldBeTrue();
+    }
+
     private static FunctionRateLimitContext CreateContext(string userIp,
         string functionName = "TestFunction",
         string? clientId = null,
