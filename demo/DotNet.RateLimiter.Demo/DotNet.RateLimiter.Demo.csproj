@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="DotNetRateLimiter" Version="4.0.0" />
+		<PackageReference Include="Microsoft.OpenApi" Version="2.13.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
 	</ItemGroup>
 
