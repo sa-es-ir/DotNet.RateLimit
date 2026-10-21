@@ -45,6 +45,26 @@ public class RateLimitFunctionMiddlewareTest
     }
 
     [Fact]
+    public void GetRateLimitAttributes_CachesResultPerFunctionId()
+    {
+        var definition = new FakeFunctionDefinition
+        {
+            IdValue = nameof(GetRateLimitAttributes_CachesResultPerFunctionId),
+            EntryPointValue = $"{typeof(DecoratedFunctionTarget).FullName}.{nameof(DecoratedFunctionTarget.DecoratedFunction)}",
+            PathToAssemblyValue = typeof(DecoratedFunctionTarget).Assembly.Location
+        };
+
+        var first = RateLimitFunctionMiddleware.GetRateLimitAttributes(definition);
+
+        //same id, different entry point: the cached result must be returned without reflecting again
+        definition.EntryPointValue = $"{typeof(DecoratedFunctionTarget).FullName}.{nameof(DecoratedFunctionTarget.PlainFunction)}";
+        var second = RateLimitFunctionMiddleware.GetRateLimitAttributes(definition);
+
+        first.Count.ShouldBe(1);
+        second.ShouldBeSameAs(first);
+    }
+
+    [Fact]
     public void BuildRateLimitContext_CopiesRequestAndBindingData()
     {
         var context = new FakeFunctionContext

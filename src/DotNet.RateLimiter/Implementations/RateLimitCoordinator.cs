@@ -86,39 +86,6 @@ public class RateLimitCoordinator : IRateLimitCoordinator
         }
     }
 
-    private (bool ShortCircuit, bool HasAccess, string RateLimitPrefixKey) InitialChecking(string userIp, string clientId, RateLimitParams ratelimitParams)
-    {
-        //bypass request if rate limit was disable
-        if (!_options.Value.EnableRateLimit)
-        {
-            return (true, true, default);
-        }
-
-        if (ratelimitParams.Limit <= 0 || ratelimitParams.PeriodInSec <= 0)
-            throw new ArgumentOutOfRangeException("PeriodInSec and Limit must be greater than 0 for RateLimiter");
-
-        //skip rate limit if IP is in white list
-        if (_options.Value.IpWhiteList.Contains(userIp))
-        {
-            return (true, true, default);
-        }
-
-        var rateLimitPrefixKey = userIp;
-
-        if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) && clientId != null)
-        {
-            //skip rate limit for client identifiers in white list
-            if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
-            {
-                return (true, true, default);
-            }
-
-            rateLimitPrefixKey = clientId;
-        }
-
-        return (false, true, rateLimitPrefixKey);
-    }
-
 #if NET7_0_OR_GREATER
     public async Task<bool> CheckRateLimitAsync(EndpointFilterInvocationContext context, RateLimitEndPointParams ratelimitParams)
     {
@@ -213,6 +180,39 @@ public class RateLimitCoordinator : IRateLimitCoordinator
             _logger.LogCritical(e, e.Message);
             return true;
         }
+    }
+
+    private (bool ShortCircuit, bool HasAccess, string RateLimitPrefixKey) InitialChecking(string userIp, string clientId, RateLimitParams ratelimitParams)
+    {
+        //bypass request if rate limit was disable
+        if (!_options.Value.EnableRateLimit)
+        {
+            return (true, true, default);
+        }
+
+        if (ratelimitParams.Limit <= 0 || ratelimitParams.PeriodInSec <= 0)
+            throw new ArgumentOutOfRangeException("PeriodInSec and Limit must be greater than 0 for RateLimiter");
+
+        //skip rate limit if IP is in white list
+        if (_options.Value.IpWhiteList.Contains(userIp))
+        {
+            return (true, true, default);
+        }
+
+        var rateLimitPrefixKey = userIp;
+
+        if (!string.IsNullOrWhiteSpace(_options.Value.ClientIdentifier) && clientId != null)
+        {
+            //skip rate limit for client identifiers in white list
+            if (_options.Value.ClientIdentifierWhiteList.Contains(clientId))
+            {
+                return (true, true, default);
+            }
+
+            rateLimitPrefixKey = clientId;
+        }
+
+        return (false, true, rateLimitPrefixKey);
     }
 
     private static void ProvideRateLimitKey(HttpContext httpContext, RateLimitParams ratelimitParams, StringBuilder rateLimitKey)

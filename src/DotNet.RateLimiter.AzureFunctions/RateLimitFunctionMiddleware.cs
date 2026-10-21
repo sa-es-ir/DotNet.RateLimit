@@ -6,8 +6,10 @@ using DotNet.RateLimiter.Utilities;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -22,13 +24,21 @@ namespace DotNet.RateLimiter.Functions;
 /// </summary>
 public class RateLimitFunctionMiddleware : IFunctionsWorkerMiddleware
 {
+    //attributes on a compiled function never change, so resolve them once per function id
+    private static readonly ConcurrentDictionary<string, IReadOnlyList<RateLimit>> _attributeCache = new();
+
     private readonly IOptions<RateLimitOptions> _options;
     private readonly IRateLimitCoordinator _rateLimitCoordinator;
+    private readonly ILogger<RateLimitFunctionMiddleware> _logger;
 
-    public RateLimitFunctionMiddleware(IOptions<RateLimitOptions> options, IRateLimitCoordinator rateLimitCoordinator)
+    public RateLimitFunctionMiddleware(
+        IOptions<RateLimitOptions> options,
+        IRateLimitCoordinator rateLimitCoordinator,
+        ILogger<RateLimitFunctionMiddleware> logger)
     {
         _options = options;
         _rateLimitCoordinator = rateLimitCoordinator;
+        _logger = logger;
     }
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
@@ -39,44 +49,8 @@ public class RateLimitFunctionMiddleware : IFunctionsWorkerMiddleware
             await next(context);
     }
 
-    private async Task<bool> TryHandleRateLimitAsync(FunctionContext context)
-    {
-        try
-        {
-            var request = await context.GetHttpRequestDataAsync();
-            if (request is null)
-                return false;
-
-            var attributes = ResolveRateLimitAttributes(context.FunctionDefinition);
-            if (attributes.Count == 0)
-                return false;
-
-            foreach (var attribute in attributes)
-            {
-                var rateLimitContext = BuildRateLimitContext(context, request, _options.Value);
-                var rateLimitParams = new RateLimitEndPointParams
-                {
-                    PeriodInSec = attribute.PeriodInSec,
-                    Limit = attribute.Limit,
-                    RouteParams = attribute.RouteParams,
-                    QueryParams = attribute.QueryParams
-                };
-
-                if (!await _rateLimitCoordinator.CheckRateLimitAsync(rateLimitContext, rateLimitParams))
-                {
-                    await WriteRateLimitResponse(context, request, _options.Value);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        catch
-        {
-            //rate limiting must never take a function down
-            return false;
-        }
-    }
+    internal static IReadOnlyList<RateLimit> GetRateLimitAttributes(FunctionDefinition functionDefinition) =>
+        _attributeCache.GetOrAdd(functionDefinition.Id, _ => ResolveRateLimitAttributes(functionDefinition));
 
     internal static IReadOnlyList<RateLimit> ResolveRateLimitAttributes(FunctionDefinition functionDefinition)
     {
@@ -164,6 +138,46 @@ public class RateLimitFunctionMiddleware : IFunctionsWorkerMiddleware
         await response.WriteStringAsync(RateLimitResponseBuilder.BuildResponse(options));
 
         context.GetInvocationResult().Value = response;
+    }
+
+    private async Task<bool> TryHandleRateLimitAsync(FunctionContext context)
+    {
+        try
+        {
+            var request = await context.GetHttpRequestDataAsync();
+            if (request is null)
+                return false;
+
+            var attributes = GetRateLimitAttributes(context.FunctionDefinition);
+            if (attributes.Count == 0)
+                return false;
+
+            var rateLimitContext = BuildRateLimitContext(context, request, _options.Value);
+            foreach (var attribute in attributes)
+            {
+                var rateLimitParams = new RateLimitEndPointParams
+                {
+                    PeriodInSec = attribute.PeriodInSec,
+                    Limit = attribute.Limit,
+                    RouteParams = attribute.RouteParams,
+                    QueryParams = attribute.QueryParams
+                };
+
+                if (!await _rateLimitCoordinator.CheckRateLimitAsync(rateLimitContext, rateLimitParams))
+                {
+                    await WriteRateLimitResponse(context, request, _options.Value);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception e)
+        {
+            //rate limiting must never take a function down
+            _logger.LogCritical(e, e.Message);
+            return false;
+        }
     }
 
     private static string GetUserIp(HttpRequestData request, string headerName)
