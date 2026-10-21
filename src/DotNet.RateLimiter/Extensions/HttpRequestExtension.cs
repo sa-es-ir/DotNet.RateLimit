@@ -28,7 +28,16 @@ namespace DotNet.RateLimiter.Extensions
 
             foreach (var ip in ipList)
             {
-                if (IPAddress.TryParse(ip.Trim(), out var ipAddress))
+                var value = ip.Trim();
+                if (IPAddress.TryParse(value, out var ipAddress))
+                {
+                    ipAddresses.Add(ipAddress);
+                    continue;
+                }
+
+                //IPv4 with port, e.g. "203.0.113.5:54321" as written by Azure App Service; IPv6 with port ("[::1]:443") already parses above
+                var colon = value.IndexOf(':');
+                if (colon > 0 && colon == value.LastIndexOf(':') && IPAddress.TryParse(value.Substring(0, colon), out ipAddress))
                     ipAddresses.Add(ipAddress);
             }
 
