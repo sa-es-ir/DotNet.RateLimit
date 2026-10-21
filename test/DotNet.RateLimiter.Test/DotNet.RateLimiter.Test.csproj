@@ -43,6 +43,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\DotNet.RateLimiter\DotNet.RateLimiter.csproj" />
+		<ProjectReference Include="..\..\src\DotNet.RateLimiter.AzureFunctions\DotNet.RateLimiter.AzureFunctions.csproj" />
 	</ItemGroup>
 
 </Project>

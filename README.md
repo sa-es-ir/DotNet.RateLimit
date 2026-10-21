@@ -159,7 +159,13 @@ public class RateLimitOnAllController : ControllerBase
 ```
 ### Using with Azure Functions (isolated worker)
 
-Azure Functions **isolated worker** apps can use the same `[RateLimit]` attribute on `HttpTrigger` functions. Register the rate limit service and add `RateLimitFunctionMiddleware` in `Program.cs`:
+Azure Functions **isolated worker** apps can use the same `[RateLimit]` attribute on `HttpTrigger` functions. Install the separate package (it keeps the Functions Worker dependencies out of the core package):
+
+```
+dotnet add package DotNetRateLimiter.AzureFunctions
+```
+
+Register the rate limit service and add `RateLimitFunctionMiddleware` in `Program.cs`:
 
 ```csharp
 using DotNet.RateLimiter;

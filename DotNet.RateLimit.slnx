@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/DotNet.RateLimiter/DotNet.RateLimiter.csproj" />
+    <Project Path="src/DotNet.RateLimiter.AzureFunctions/DotNet.RateLimiter.AzureFunctions.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/DotNet.RateLimiter.Test/DotNet.RateLimiter.Test.csproj" />

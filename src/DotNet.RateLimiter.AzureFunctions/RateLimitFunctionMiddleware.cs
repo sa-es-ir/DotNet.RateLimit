@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using DotNet.RateLimiter.ActionFilters;
 using DotNet.RateLimiter.Extensions;
 using DotNet.RateLimiter.Interfaces;
@@ -183,4 +182,3 @@ public class RateLimitFunctionMiddleware : IFunctionsWorkerMiddleware
             : null;
     }
 }
-#endif
