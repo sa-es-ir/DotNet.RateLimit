@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net10.0;net11.0</TargetFrameworks>
 		<AssemblyName>DotNet.RateLimiter</AssemblyName>
 		<RootNamespace>DotNet.RateLimiter</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -36,9 +36,9 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'net9.0'">
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.11" />
+	<ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework) == 'net8.0'">
@@ -46,7 +46,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net9.0' Or $(TargetFramework) == 'net10.0'">
+	<ItemGroup Condition="$(TargetFramework) == 'net8.0' Or $(TargetFramework) == 'net10.0' Or $(TargetFramework) == 'net11.0'">
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
